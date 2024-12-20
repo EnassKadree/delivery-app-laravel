@@ -29,6 +29,7 @@ class ProductController extends Controller
     public function show(string $id)
     {
         $product=Product::where('id',$id)->first();
+        if($product)
         return response()->json($product,200);
     }
 

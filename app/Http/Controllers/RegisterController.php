@@ -6,8 +6,8 @@ use App\Models\Customer;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use Illuminate\Support\Facades\Password;
+use App\Http\Controllers\ExceptionsTwilioException;
+use App\Http\Controllers\Client;
 
 class RegisterController extends Controller
 {
@@ -30,6 +30,7 @@ class RegisterController extends Controller
             'password'=>['required','confirmed'],
             'address'=>['required'],
         ]);
+       
         //create user
         $user=User::create([
             'phone'=>$attributes['phone'],
@@ -37,7 +38,6 @@ class RegisterController extends Controller
             'password'=>bcrypt($attributes['password']),
             'role'=>'customer',
         ]);
-        $user->sendEmailVerificationNotification();
         //create customer
         $customer=Customer::create([
             'user_id'=>$user['id'],
@@ -55,15 +55,6 @@ class RegisterController extends Controller
             'token'=>$token
         ];
         return response($response,201);
-    }
-
-    public function verifyEmail(EmailVerificationRequest $request)
-    {
-        $request->fulfill();
-    
-        return response()->json([
-            'message' => 'Email verified successfully!',
-        ]);
     }
 
     /**

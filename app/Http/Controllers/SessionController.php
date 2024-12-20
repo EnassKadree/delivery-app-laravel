@@ -26,9 +26,10 @@ class SessionController extends Controller
         //validate
         $attributes=request()->validate([
             'phone'=>['required'],
-            'password'=>['required']
+            'password'=>['required'],
+            'email'=>['required']
         ]);
-        
+
         //attempt to login the user
         if(!Auth::attempt($attributes))
         {
@@ -44,8 +45,8 @@ class SessionController extends Controller
         $response=[
             'user'=>$user,
             'token'=>$token
-        ];  
-        return response($response,201);              
+        ];
+        return response($response,201);
     }
 
     /**
