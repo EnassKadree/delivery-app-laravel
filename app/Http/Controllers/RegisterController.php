@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Support\Facades\Password;
 
 class RegisterController extends Controller
@@ -25,16 +26,18 @@ class RegisterController extends Controller
             'first_name'=>['required'],
             'last_name'=>['required'],
             'phone' => ['required','regex:/^09\d{8}$/','size:10'],
+            'email'=>['required','email'],
             'password'=>['required','confirmed'],
             'address'=>['required'],
         ]);
         //create user
         $user=User::create([
             'phone'=>$attributes['phone'],
+            'email'=>$attributes['email'],
             'password'=>bcrypt($attributes['password']),
             'role'=>'customer',
         ]);
-        $token=$user->createToken('usertoken')->plainTextToken;
+        $user->sendEmailVerificationNotification();
         //create customer
         $customer=Customer::create([
             'user_id'=>$user['id'],
@@ -43,13 +46,24 @@ class RegisterController extends Controller
             'image'=>$request['image'],
             'address'=>$attributes['address'],
         ]);
+        $token=$user->createToken('usertoken')->plainTextToken;
         //log in
         Auth::login($customer);
         $response=[
+            'message' => 'Registration successful! A verification email has been sent.',
             'customer'=>$customer,
             'token'=>$token
         ];
         return response($response,201);
+    }
+
+    public function verifyEmail(EmailVerificationRequest $request)
+    {
+        $request->fulfill();
+    
+        return response()->json([
+            'message' => 'Email verified successfully!',
+        ]);
     }
 
     /**
