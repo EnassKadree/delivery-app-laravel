@@ -24,13 +24,15 @@ Route::get('/show',[RegisterController::class,'show'])->middleware('auth:sanctum
 
 Route::post('/login',[SessionController::class,'store']);
 
-Route::get('/categories',[CategoryController::class,'index']);
-Route::get('/categories/{id}',[CategoryController::class,'show']);
+Route::middleware(['setlocale'])->get('/categories',[CategoryController::class,'index']);
+Route::middleware(['setlocale'])->get('/categories/{id}',[CategoryController::class,'show']);
 
-Route::get('/stores',[StoreController::class,'index']);
-Route::get('/stores/{id}',[StoreController::class,'show']);
+Route::middleware(['setlocale'])->get('/stores',[StoreController::class,'index']);
+Route::middleware(['setlocale'])->get('/stores/{id}',[StoreController::class,'show']);
 
-Route::get('/product/{id}',[ProductController::class,'show']);
+
+Route::get('/products',[ProductController::class,'index']);
+Route::get('/products/{id}',[ProductController::class,'show']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

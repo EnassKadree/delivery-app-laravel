@@ -11,6 +11,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "laravel/ui": "^4.6",
+        "spatie/laravel-translatable": "^6.9",
         "symfony/mailer": "^7.2",
         "twilio/sdk": "^8.3"
     },

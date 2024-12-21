@@ -21,19 +21,19 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Store::class);
-            $table->string('name');
-            $table->text('description');
+            $table->json('name');
+            $table->json('description');
             $table->double('price');
             $table->unsignedInteger('stock');
             $table->string('image');
-            $table->foreignIdFor(Category::class);                        
+            $table->foreignIdFor(Category::class);
             $table->timestamps();
         });
-        
+
         Schema::create('favorites', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Product::class);
-            $table->foreignIdFor(Customer::class);                     
+            $table->foreignIdFor(Customer::class);
             $table->timestamps();
         });
 
