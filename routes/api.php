@@ -30,9 +30,9 @@ Route::middleware(['setlocale'])->get('/categories/{id}',[CategoryController::cl
 Route::middleware(['setlocale'])->get('/stores',[StoreController::class,'index']);
 Route::middleware(['setlocale'])->get('/stores/{id}',[StoreController::class,'show']);
 
-
 Route::get('/products',[ProductController::class,'index']);
 Route::get('/products/{id}',[ProductController::class,'show']);
+Route::get('/search', [ProductController::class,'search']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

@@ -33,4 +33,5 @@ class Product extends Model
     {
         return $this->belongsToMany(Cart::class,'cart_item','product_id','cart_id');
     }
+
 }

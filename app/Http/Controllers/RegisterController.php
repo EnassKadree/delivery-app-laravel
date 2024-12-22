@@ -30,7 +30,11 @@ class RegisterController extends Controller
             'password'=>['required','confirmed'],
             'address'=>['required'],
         ]);
-       
+        $existingUser = User::where('phone', $attributes['phone'])->first();
+
+        if ($existingUser) {
+            return response()->json(['message' => 'Phone number already exists.'], 400);
+        }
         //create user
         $user=User::create([
             'phone'=>$attributes['phone'],

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Store;
 use Illuminate\Http\Request;
 use App\Http\Middleware\SetLocale;
+
 
 class ProductController extends Controller
 {
@@ -22,22 +24,22 @@ class ProductController extends Controller
 
         $locale =app()->getLocale();
 
-       $products =Product::latest()->take(20)->get()->map(function ($product) use ($locale)
+        $products =Product::latest()->take(20)->get()->map(function ($product) use ($locale)
         {
-           return
-           [
-               'id' => $product->id,
-               'name' => $product->getTranslation('name', $locale),
-               'description' => $product->getTranslation('description', $locale),
-               'category'=>$product->category->name,
-               'price'=>$product->price,
-               'store'=>$product->store->name,
-               'stock'=>$product->stock,
-               'image' => $product->image,
-           ];
+            return
+            [
+                'id' => $product->id,
+                'name' => $product->getTranslation('name', $locale),
+                'description' => $product->getTranslation('description', $locale),
+                'category'=>$product->category->name,
+                'price'=>$product->price,
+                'store'=>$product->store->name,
+                'stock'=>$product->stock,
+                'image' => $product->image,
+            ];
         }
-       );
-       return response()->json($products);
+        );
+        return response()->json($products);
 
     }
 
@@ -90,4 +92,45 @@ class ProductController extends Controller
     {
         //
     }
+    public function search(Request $request)
+{
+    $locale =app()->getLocale();
+    $word = $request->input('q'); 
+
+    $products = Product::where('name', 'LIKE', "%{$word}%")
+        ->orWhere('description', 'LIKE', "%{$word}%")
+        ->with('store')
+        ->get();
+        $translatedProducts=$products->map(function ($product) use ($locale)
+            {
+            return
+            [
+                'id' => $product->id,
+                'name' => $product->getTranslation('name', $locale),
+                'description' => $product->getTranslation('description', $locale),
+                'price'=>$product->price,
+                'stock'=>$product->stock,
+                'image' => $product->image,
+            ];
+            }
+        );
+
+    $stores = Store::where('name', 'LIKE', "%{$word}%")
+        ->get();
+        $translatedStores =$stores->map(function ($store) use ($locale)
+        {
+            return
+            [
+            'id'=>$store->id,
+            'name'=>$store->getTranslation('name',$locale),
+            'address'=>$store->getTranslation('address',$locale),
+            'image'=>$store->image
+            ];
+        }
+        );
+    return response()->json([
+        'products' => $translatedProducts,
+        'stores' => $stores,
+    ],200);
+}
 }

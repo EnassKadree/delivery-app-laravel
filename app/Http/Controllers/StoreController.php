@@ -29,7 +29,7 @@ class StoreController extends Controller
                 'address'=>$store->getTranslation('address',$locale),
                 'image'=>$store->image
                 ];
-             }
+            }
             );
         return response()->json($stores);
     }
