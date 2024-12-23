@@ -24,12 +24,17 @@ class CategoryController extends Controller
             return
             [
             'id'=>$category->id,
-            'name'=>$category->getTranslation('name',$locale),
+            'name'=>$category->name,
             'image'=>$category->image
             ];
          }
         );
-        return  response()->json($categories);
+        return  response()->json(
+            [
+            'Status' => 'Success',
+            'Message' => 'Data has been fetched successfuly.',
+            'categories'=>$categories
+            ]);
     }
 
     /**
@@ -46,14 +51,23 @@ class CategoryController extends Controller
     public function show(string $id)
     {
         $locale =app()->getLocale();
+
         $category=Category::where('id',$id)->first();
+        if(!$category)
+        {
+          return  response()->json(
+           [
+            'Status' => 'Failed',
+            'Message' => 'There is no such  category.',
+             ],400);
+        }
         $products =$category->products->map(function ($product) use ($locale)
         {
            return
            [
                'id' => $product->id,
-               'name' => $product->getTranslation('name', $locale),
-               'description' => $product->getTranslation('description', $locale),
+               'name' => $product->name,
+               'description' => $product->description,
                'price'=>$product->price,
                'stock'=>$product->stock,
                'image' => $product->image,
@@ -61,7 +75,12 @@ class CategoryController extends Controller
         }
        );
 
-       return response()->json($products,200);
+       return response()->json(
+        [
+        'Status' => 'Success',
+        'Message' => 'Data has been fetched successfuly.',
+        'products'=>$products
+        ],200);
     }
 
     /**

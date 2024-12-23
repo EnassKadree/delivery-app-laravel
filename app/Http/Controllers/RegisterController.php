@@ -33,7 +33,11 @@ class RegisterController extends Controller
         $existingUser = User::where('phone', $attributes['phone'])->first();
 
         if ($existingUser) {
-            return response()->json(['message' => 'Phone number already exists.'], 400);
+            return response()->json(
+                [
+                'Status' => 'Failed',
+                'message' => 'Phone number already exists.'
+                ], 400);
         }
         //create user
         $user=User::create([
@@ -54,6 +58,7 @@ class RegisterController extends Controller
         //log in
         Auth::login($customer);
         $response=[
+            'Status' => 'Success',
             'message' => 'Registration successful! A verification email has been sent.',
             'customer'=>$customer,
             'token'=>$token
@@ -69,7 +74,8 @@ class RegisterController extends Controller
         $user=Auth::user();
         $customer=Customer::where('user_id',$user->id)->first();
         return response()->json([
-
+            'Status' => 'Success',
+            'Message' => 'Data has been fetched successfuly.',
             'customer' => [
                 'first_name' => $customer->first_name,
                 'last_name' => $customer->last_name,

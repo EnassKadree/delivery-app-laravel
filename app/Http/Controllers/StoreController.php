@@ -25,13 +25,18 @@ class StoreController extends Controller
                 return
                 [
                 'id'=>$store->id,
-                'name'=>$store->getTranslation('name',$locale),
-                'address'=>$store->getTranslation('address',$locale),
+                'name' => $store->name,
+                'address'=>$store->address,
                 'image'=>$store->image
                 ];
             }
             );
-        return response()->json($stores);
+        return response()->json(
+        [
+        'Status' => 'Success',
+        'Message' => 'Data has been fetched successfuly.',
+       'stores'=>$stores
+        ]);
     }
 
     /**
@@ -48,14 +53,25 @@ class StoreController extends Controller
     public function show(string $id)
     {
         $locale =app()->getLocale();
+
         $store=Store::where('id',$id)->first();
+
+        if(!$store)
+        {
+          return  response()->json(
+           [
+            'Status' => 'Failed',
+            'Message' => 'There is no such  store.',
+             ],400);
+        }
+
         $products =$store->products->map(function ($product) use ($locale)
          {
             return
             [
                 'id' => $product->id,
-                'name' => $product->getTranslation('name', $locale),
-                'description' => $product->getTranslation('description', $locale),
+                'name' => $product->name,
+                'description' => $product->desciption,
                 'price'=>$product->price,
                 'stock'=>$product->stock,
                 'image' => $product->image,
@@ -63,7 +79,12 @@ class StoreController extends Controller
          }
         );
 
-        return response()->json($products,200);
+        return response()->json(
+            [
+            'Status' => 'Success',
+            'Message' => 'Data has been fetched successfuly.',
+           'products'=>$products
+           ],200);
     }
 
     /**

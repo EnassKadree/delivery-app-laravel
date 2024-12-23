@@ -29,8 +29,8 @@ class ProductController extends Controller
             return
             [
                 'id' => $product->id,
-                'name' => $product->getTranslation('name', $locale),
-                'description' => $product->getTranslation('description', $locale),
+                'name' => $product->name,
+                'description' => $product->description,
                 'category'=>$product->category->name,
                 'price'=>$product->price,
                 'store'=>$product->store->name,
@@ -39,7 +39,13 @@ class ProductController extends Controller
             ];
         }
         );
-        return response()->json($products);
+        return response()->json(
+           [
+             'Status' => 'Success',
+            'Message' => 'Data has been fetched successfuly.',
+           'products'=> $products
+           ]
+        );
 
     }
 
@@ -59,22 +65,30 @@ class ProductController extends Controller
         $locale =app()->getLocale();
 
         $product=Product::where('id',$id)->first();
-
+     
         if ($product)
         {
             $translatedProduct = [
                 'id' => $product->id,
-                'name' => $product->getTranslation('name', $locale),
-                'description' => $product->getTranslation('description', $locale),
+                'name' => $product->name,
+                'description' => $product->description,
                 'price'=>$product->price,
                 'category'=>$product->category->name,
                 'stock'=>$product->stock,
                 'store'=>$product->store->name,
                 'image' => $product->image,
             ];
-            return response()->json($translatedProduct, 200);
+            return response()->json(
+            [
+                'Status' => 'Success',
+               'Message' => 'Data has been fetched successfuly.',
+               'product'=>$translatedProduct
+            ], 200);
         }
-        return response()->json(['message' => 'Product not found'], 404);
+        return response()->json([
+            'Status' => 'Failed',
+            'message' => 'Product not found'
+        ], 404);
     }
 
     /**
@@ -95,7 +109,7 @@ class ProductController extends Controller
     public function search(Request $request)
 {
     $locale =app()->getLocale();
-    $word = $request->input('q'); 
+    $word = $request->input('q');
 
     $products = Product::where('name', 'LIKE', "%{$word}%")
         ->orWhere('description', 'LIKE', "%{$word}%")
@@ -106,8 +120,8 @@ class ProductController extends Controller
             return
             [
                 'id' => $product->id,
-                'name' => $product->getTranslation('name', $locale),
-                'description' => $product->getTranslation('description', $locale),
+                'name' => $product->name,
+                'description' => $product->description,
                 'price'=>$product->price,
                 'stock'=>$product->stock,
                 'image' => $product->image,
@@ -122,15 +136,17 @@ class ProductController extends Controller
             return
             [
             'id'=>$store->id,
-            'name'=>$store->getTranslation('name',$locale),
-            'address'=>$store->getTranslation('address',$locale),
+            'name'=>$store->name,
+            'address'=>$store->address,
             'image'=>$store->image
             ];
         }
         );
-    return response()->json([
+    return response()->json(
+        [
+        'Status' => 'Success',
         'products' => $translatedProducts,
-        'stores' => $stores,
-    ],200);
+        'stores' => $translatedStores,
+        ],200);
 }
 }

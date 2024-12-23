@@ -24,11 +24,11 @@ Route::get('/show',[RegisterController::class,'show'])->middleware('auth:sanctum
 
 Route::post('/login',[SessionController::class,'store']);
 
-Route::middleware(['setlocale'])->get('/categories',[CategoryController::class,'index']);
-Route::middleware(['setlocale'])->get('/categories/{id}',[CategoryController::class,'show']);
+Route::get('/categories',[CategoryController::class,'index']);
+Route::get('/categories/{id}',[CategoryController::class,'show']);
 
-Route::middleware(['setlocale'])->get('/stores',[StoreController::class,'index']);
-Route::middleware(['setlocale'])->get('/stores/{id}',[StoreController::class,'show']);
+Route::get('/stores',[StoreController::class,'index']);
+Route::get('/stores/{id}',[StoreController::class,'show']);
 
 Route::get('/products',[ProductController::class,'index']);
 Route::get('/products/{id}',[ProductController::class,'show']);
