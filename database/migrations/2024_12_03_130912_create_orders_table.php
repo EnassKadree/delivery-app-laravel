@@ -22,7 +22,7 @@ return new class extends Migration
             $table->double('total_price');
             $table->foreignIdFor(Customer::class);
             $table->timestamps();
-        });
+                });
 
         Schema::create('order_item', function (Blueprint $table) {
             $table->id();
@@ -30,7 +30,7 @@ return new class extends Migration
             $table->foreignIdFor(Order::class);
             $table->unsignedInteger('quantity');
             $table->timestamps();
-        });        
+        });
 
         Schema::enableForeignKeyConstraints();
     }

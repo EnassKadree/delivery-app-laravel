@@ -3,10 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Spatie\Translatable\HasTranslations;
 class Product extends Model
 {
+    use HasTranslations;
+    
     protected $guarded=[];
+
+    public $translatable=['name','description'];
+
     public function store()
     {
         return $this->belongsTo(Store::class);
@@ -22,10 +27,11 @@ class Product extends Model
     public function costumers()
     {
         return $this->belongsToMany(Customer::class, 'favorites', 'customer_id', 'product_id');
-    } 
-    
+    }
+
     public function carts()
     {
         return $this->belongsToMany(Cart::class,'cart_item','product_id','cart_id');
-    }    
+    }
+
 }

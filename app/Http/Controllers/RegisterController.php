@@ -6,7 +6,8 @@ use App\Models\Customer;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Password;
+use App\Http\Controllers\ExceptionsTwilioException;
+use App\Http\Controllers\Client;
 
 class RegisterController extends Controller
 {
@@ -25,16 +26,26 @@ class RegisterController extends Controller
             'first_name'=>['required'],
             'last_name'=>['required'],
             'phone' => ['required','regex:/^09\d{8}$/','size:10'],
+            'email'=>['required','email'],
             'password'=>['required','confirmed'],
             'address'=>['required'],
         ]);
+        $existingUser = User::where('phone', $attributes['phone'])->first();
+
+        if ($existingUser) {
+            return response()->json(
+                [
+                'Status' => 'Failed',
+                'message' => 'Phone number already exists.'
+                ], 400);
+        }
         //create user
         $user=User::create([
             'phone'=>$attributes['phone'],
+            'email'=>$attributes['email'],
             'password'=>bcrypt($attributes['password']),
             'role'=>'customer',
         ]);
-        $token=$user->createToken('usertoken')->plainTextToken;
         //create customer
         $customer=Customer::create([
             'user_id'=>$user['id'],
@@ -43,9 +54,12 @@ class RegisterController extends Controller
             'image'=>$request['image'],
             'address'=>$attributes['address'],
         ]);
+        $token=$user->createToken('usertoken')->plainTextToken;
         //log in
         Auth::login($customer);
         $response=[
+            'Status' => 'Success',
+            'message' => 'Registration successful! A verification email has been sent.',
             'customer'=>$customer,
             'token'=>$token
         ];
@@ -60,7 +74,8 @@ class RegisterController extends Controller
         $user=Auth::user();
         $customer=Customer::where('user_id',$user->id)->first();
         return response()->json([
-
+            'Status' => 'Success',
+            'Message' => 'Data has been fetched successfuly.',
             'customer' => [
                 'first_name' => $customer->first_name,
                 'last_name' => $customer->last_name,
