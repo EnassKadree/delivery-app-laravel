@@ -18,16 +18,15 @@ class CategoryController extends Controller
     public function index()
     {
 
-        $locale =app()->getLocale();
-         $categories =Category::all()->map(function ($category) use ($locale)
-         {
+        $categories =Category::all()->map(function ($category)
+        {
             return
             [
             'id'=>$category->id,
             'name'=>$category->name,
             'image'=>$category->image
             ];
-         }
+        }
         );
         return  response()->json(
             [
@@ -50,32 +49,31 @@ class CategoryController extends Controller
      */
     public function show(string $id)
     {
-        $locale =app()->getLocale();
 
         $category=Category::where('id',$id)->first();
         if(!$category)
         {
-          return  response()->json(
-           [
+        return  response()->json(
+        [
             'Status' => 'Failed',
             'Message' => 'There is no such  category.',
-             ],400);
+        ],400);
         }
-        $products =$category->products->map(function ($product) use ($locale)
+        $products =$category->products->map(function ($product)
         {
-           return
-           [
-               'id' => $product->id,
-               'name' => $product->name,
-               'description' => $product->description,
-               'price'=>$product->price,
-               'stock'=>$product->stock,
-               'image' => $product->image,
-           ];
+            return
+            [
+                'id' => $product->id,
+                'name' => $product->name,
+                'description' => $product->description,
+                'price'=>$product->price,
+                'stock'=>$product->stock,
+                'image' => $product->image,
+            ];
         }
-       );
+    );
 
-       return response()->json(
+    return response()->json(
         [
         'Status' => 'Success',
         'Message' => 'Data has been fetched successfuly.',

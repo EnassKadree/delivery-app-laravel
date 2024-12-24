@@ -22,9 +22,7 @@ class ProductController extends Controller
     public function index()
     {
 
-        $locale =app()->getLocale();
-
-        $products =Product::latest()->take(20)->get()->map(function ($product) use ($locale)
+        $products =Product::latest()->take(20)->get()->map(function ($product)
         {
             return
             [
@@ -40,11 +38,11 @@ class ProductController extends Controller
         }
         );
         return response()->json(
-           [
-             'Status' => 'Success',
+        [
+            'Status' => 'Success',
             'Message' => 'Data has been fetched successfuly.',
-           'products'=> $products
-           ]
+            'products'=> $products
+        ]
         );
 
     }
@@ -65,7 +63,7 @@ class ProductController extends Controller
         $locale =app()->getLocale();
 
         $product=Product::where('id',$id)->first();
-     
+
         if ($product)
         {
             $translatedProduct = [
@@ -81,8 +79,8 @@ class ProductController extends Controller
             return response()->json(
             [
                 'Status' => 'Success',
-               'Message' => 'Data has been fetched successfuly.',
-               'product'=>$translatedProduct
+                'Message' => 'Data has been fetched successfuly.',
+                'product'=>$translatedProduct
             ], 200);
         }
         return response()->json([
@@ -107,46 +105,45 @@ class ProductController extends Controller
         //
     }
     public function search(Request $request)
-{
-    $locale =app()->getLocale();
-    $word = $request->input('q');
+    {
 
-    $products = Product::where('name', 'LIKE', "%{$word}%")
-        ->orWhere('description', 'LIKE', "%{$word}%")
-        ->with('store')
-        ->get();
-        $translatedProducts=$products->map(function ($product) use ($locale)
+        $word = $request->input('q');
+
+        $products = Product::where('name', 'LIKE', "%{$word}%")
+            ->orWhere('description', 'LIKE', "%{$word}%")
+            ->get();
+            $translatedProducts=$products->map(function ($product)
+                {
+                return
+                [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'description' => $product->description,
+                    'price'=>$product->price,
+                    'stock'=>$product->stock,
+                    'image' => $product->image,
+                ];
+                }
+            );
+
+        $stores = Store::where('name', 'LIKE', "%{$word}%")
+            ->get();
+            $translatedStores =$stores->map(function ($store)
             {
-            return
-            [
-                'id' => $product->id,
-                'name' => $product->name,
-                'description' => $product->description,
-                'price'=>$product->price,
-                'stock'=>$product->stock,
-                'image' => $product->image,
-            ];
+                return
+                [
+                'id'=>$store->id,
+                'name'=>$store->name,
+                'address'=>$store->address,
+                'image'=>$store->image
+                ];
             }
-        );
-
-    $stores = Store::where('name', 'LIKE', "%{$word}%")
-        ->get();
-        $translatedStores =$stores->map(function ($store) use ($locale)
-        {
-            return
+            );
+        return response()->json(
             [
-            'id'=>$store->id,
-            'name'=>$store->name,
-            'address'=>$store->address,
-            'image'=>$store->image
-            ];
-        }
-        );
-    return response()->json(
-        [
-        'Status' => 'Success',
-        'products' => $translatedProducts,
-        'stores' => $translatedStores,
-        ],200);
-}
+            'Status' => 'Success',
+            'products' => $translatedProducts,
+            'stores' => $translatedStores,
+            ],200);
+    }
 }

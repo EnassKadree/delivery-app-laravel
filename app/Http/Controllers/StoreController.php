@@ -19,8 +19,7 @@ class StoreController extends Controller
     public function index()
     {
 
-        $locale =app()->getLocale();
-        $stores =Store::all()->map(function ($store) use ($locale)
+        $stores =Store::all()->map(function ($store)
             {
                 return
                 [
@@ -35,7 +34,7 @@ class StoreController extends Controller
         [
         'Status' => 'Success',
         'Message' => 'Data has been fetched successfuly.',
-       'stores'=>$stores
+        'stores'=>$stores
         ]);
     }
 
@@ -52,21 +51,20 @@ class StoreController extends Controller
      */
     public function show(string $id)
     {
-        $locale =app()->getLocale();
 
         $store=Store::where('id',$id)->first();
 
         if(!$store)
         {
-          return  response()->json(
-           [
-            'Status' => 'Failed',
-            'Message' => 'There is no such  store.',
-             ],400);
+            return  response()->json(
+            [
+                'Status' => 'Failed',
+                'Message' => 'There is no such  store.',
+            ],400);
         }
 
-        $products =$store->products->map(function ($product) use ($locale)
-         {
+        $products =$store->products->map(function ($product)
+        {
             return
             [
                 'id' => $product->id,
@@ -76,15 +74,15 @@ class StoreController extends Controller
                 'stock'=>$product->stock,
                 'image' => $product->image,
             ];
-         }
+        }
         );
 
         return response()->json(
             [
             'Status' => 'Success',
             'Message' => 'Data has been fetched successfuly.',
-           'products'=>$products
-           ],200);
+            'products'=>$products
+            ],200);
     }
 
     /**
