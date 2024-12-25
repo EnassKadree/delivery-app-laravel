@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -78,10 +79,41 @@ class SessionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        //
-    }
+        $user=Auth::user();
+        $customer=Customer::where('user_id',$user->id)->first();
+        $attributes=request()->validate([
+            'first_name'=>['required'],
+            'last_name'=>['required'],
+            'address'=>['required'],
+            'phone'=>['required'],
+        ]);
+
+        $user->User::update(
+            [
+                'phone' => $attributes['phone']
+            ]
+             );
+             $customer->update([
+            'first_name' => $attributes['first_name'],
+            'last_name' => $attributes['last_name'],
+            'address' => $attributes['address'],
+        ]);
+        return response([
+            'Status' => 'Success',
+            'Message' => 'updated successfully ',
+            'customer' => [
+                'first_name' =>$attributes['first_name'],
+                'last_name' =>$attributes['last_name'],
+                'image' =>$request->image,
+                'phone' => $attributes['phone'],
+                'address'=>$attributes['address']
+            ],
+        ], 200);
+
+
+ }
 
     /**
      * Remove the specified resource from storage.

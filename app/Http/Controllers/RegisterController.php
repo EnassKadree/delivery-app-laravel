@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\User;
+use App\Models\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ExceptionsTwilioException;
@@ -54,6 +55,12 @@ class RegisterController extends Controller
             'image'=>$request['image'],
             'address'=>$attributes['address'],
         ]);
+
+        Cart::create([
+            'customer_id'=>$customer->id,
+            'total_price'=>0
+        ]);
+        
         $token=$user->createToken('usertoken')->plainTextToken;
         //log in
         Auth::login($customer);

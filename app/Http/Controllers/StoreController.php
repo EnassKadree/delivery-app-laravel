@@ -100,4 +100,46 @@ class StoreController extends Controller
     {
         //
     }
+    
+    public function search(Request $request, $id)
+    {
+        $word = $request->input('q');
+
+        $store=Store::where('id',$id)->first();
+        if (!$store)
+        {
+            return response()->json([
+                'Status' => 'Error',
+                'message' => 'Store not found',
+            ], 404);
+        }
+
+        $store_products =$store->products()
+        ->where('name', 'LIKE', "%{$word}%")
+        ->orWhere('description', 'LIKE', "%{$word}%")
+        ->get();
+
+            $translatedProducts= $store_products ->map(function ($product)
+                {
+                return
+                [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'description' => $product->description,
+                    'price'=>$product->price,
+                    'stock'=>$product->stock,
+                    'image' => $product->image,
+                ];
+                }
+            );
+
+        return response()->json(
+            [
+            'Status' => 'Success',
+            "message"=>'search result in this store',
+            'products' => $translatedProducts,
+            ],200);
+    }
 }
+
+

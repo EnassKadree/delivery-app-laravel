@@ -47,11 +47,12 @@ class FavoriteController extends Controller
         $product_id=$id;
         $user=Auth::user();
         $customer_id=Customer::where('user_id',$user->id)->first()->id;
+        
         $exist=DB::table('favorites')->where([
             ['product_id',$product_id],
             ['customer_id',$customer_id]
         ])->exists();
-        
+
         if($exist){
             return response()->json([
             'Status' => 'Success',
@@ -61,7 +62,7 @@ class FavoriteController extends Controller
             'product_id'=>$product_id,
             'customer_id'=>$customer_id
         ]);
-        return response()->json(['Status' => 'Success','message' => 'Product added to favorites successfully'],200);        
+        return response()->json(['Status' => 'Success','message' => 'Product added to favorites successfully'],200);
     }
 
     /**
@@ -69,7 +70,7 @@ class FavoriteController extends Controller
      */
     public function show(string $id)
     {
-        
+
     }
 
     /**
@@ -87,20 +88,32 @@ class FavoriteController extends Controller
     {
         $user=Auth::user();
         $customer=Customer::where('user_id',$user->id)->first();
-        $product =Product::where('id',$id)->first();  
-    
-        if (!$product) {  
-            return response([  
-                'Status'=> 'Failed',  
-                'Error' => 'Please provide a product.'  
-            ], 404); 
-        } 
+        $product =Product::where('id',$id)->first();
 
-        $customer->favorites()->detach($product->id);  
+        if (!$product) {
+            return response([
+                'Status'=> 'Failed',
+                'Error' => 'Please provide a product.'
+            ], 404);
+        }
 
-        return response([  
-            'Status' => 'Success',  
-            'Message' => 'product has been deleted from favorites.'  
+        $exist=DB::table('favorites')->where([
+            ['product_id',$product->id],
+            ['customer_id',$customer->id]
+        ])->exists();
+
+        if(!$exist)
+        {
+            return response()->json([
+            'Status' => 'Failed',
+            'message' => 'Product does not exist in favorites'], 400);
+        }
+
+        $customer->favorites()->detach($product->id);
+
+        return response([
+            'Status' => 'Success',
+            'Message' => 'product has been deleted from favorites.'
         ], 201);
     }
 }
