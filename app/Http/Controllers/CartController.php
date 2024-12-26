@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cart;
 use App\Models\Product;
+use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Customer;
@@ -11,6 +12,10 @@ use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(SetLocale::class);
+    }
     /**
      * Display a listing of the resource.
      */
@@ -37,7 +42,7 @@ class CartController extends Controller
         {
 
             $status = $locale == 'ar' ? ' فشل' : 'Failed';
-            $message = $locale == 'ar' ? 'نفدت الكمية.' : 'out of stock.'; 
+            $message = $locale == 'ar' ? 'نفدت الكمية.' : 'out of stock.';
 
             return response()->json(
                 [
@@ -70,7 +75,7 @@ class CartController extends Controller
             );
 
             $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
-            $message = $locale == 'ar' ? 'تم إضافة المنتج إلى السلة بنجاح.' : 'added to cart successfully.'; 
+            $message = $locale == 'ar' ? 'تم إضافة المنتج إلى السلة بنجاح.' : 'added to cart successfully.';
 
             return response()->json(
                 [
@@ -114,13 +119,13 @@ class CartController extends Controller
                 );
 
                 $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
-                $message = $locale == 'ar' ? 'تم إضافة المنتج إلى السلة بنجاح.' : 'added to cart successfully.'; 
+                $message = $locale == 'ar' ? 'تم إضافة المنتج إلى السلة بنجاح.' : 'added to cart successfully.';
 
             return response()->json(
                 [
                     'status'=>$status,
                     'message'=>$message,
-                'qua'=> $row->quantity+1
+                'quantity'=> $row->quantity+1
                 ], 200);
 
         }
@@ -141,29 +146,55 @@ class CartController extends Controller
         $customer_cart=$customer->cart;
         $cart_items=$customer_cart->products;
 
-        $products =$cart_items->map(function ($product)
+        $products =$cart_items->map(function ($product)use($customer_cart,$customer)
         {
+
+            if( !$product->carts )
+            {
+                $isInCart=false;
+            }
+            else
+            {
+                $isInCart = $product->carts->pluck('id')->contains($customer_cart->id);
+            }
+
+            if(!$product->customers)
+            {
+                $isFavorite=false;
+            }
+            else
+            {
+                $isFavorite=$product->customers->pluck('id')->contains($customer->id);
+            }
+
             return
             [
                 'id' => $product->id,
                 'name' => $product->name,
                 'description' => $product->description,
+                'category'=>$product->category->name,
                 'price'=>$product->price,
+                'store'=>$product->store->name,
+                'store_image'=>$product->store->logo_image,
                 'stock'=>$product->stock,
                 'image' => $product->image,
-                'quantity'=>$product->pivot->quantity
+                'isInCart'=>$isInCart,
+                'isFavorite'=>$isFavorite
             ];
         }
-    );
+        );
+
+
 
         $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
-        $message = $locale == 'ar' ? 'المنتج في هذه السلة' : 'product in this cart.'; 
-    
+        $message = $locale == 'ar' ? 'المنتج في هذه السلة' : 'product in this cart.';
+
         return response()->json(
         [
             'status'=>$status,
             'message'=>$message,
-            'products'=> $products
+            'products'=> $products,
+            'total_price'=>$customer->cart->total_price
         ], 200);
 
     }
@@ -217,7 +248,7 @@ class CartController extends Controller
         $customer_cart->products()->detach($product->id);
 
         $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
-        $message = $locale == 'ar' ? 'تم حذف المنتج من السلة.' : 'product has been deleted from cart.';         
+        $message = $locale == 'ar' ? 'تم حذف المنتج من السلة.' : 'product has been deleted from cart.';
 
         return response([
             'status'=>$status,
@@ -272,20 +303,20 @@ class CartController extends Controller
                 ]);
 
                 $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
-                $message = $locale == 'ar' ? 'تم حذف المنتج ' : 'product is removed.';   
+                $message = $locale == 'ar' ? 'تم حذف المنتج ' : 'product is removed.';
 
                 return response()->json(
                     [
                         'status'=>$status,
                         'message'=>$message,
-                        'qua'=> $row->quantity-1
+                        'quantity'=> $row->quantity-1
                     ], 200);
 
             }
             $customer_cart->products()->detach($product->id);
 
             $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
-            $message = $locale == 'ar' ? 'تم حذف المنتج من السلة.' : 'product has been deleted from cart.';  
+            $message = $locale == 'ar' ? 'تم حذف المنتج من السلة.' : 'product has been deleted from cart.';
 
             return response([
                 'status'=>$status,
@@ -300,34 +331,55 @@ class CartController extends Controller
         $locale =app()->getLocale();
 
         $word = $request->input('q');
-
         $user=Auth::user();
         $customer=Customer::where('user_id',$user->id)->first();
         $customer_cart=$customer->cart;
-
         $cart_products = $customer_cart->products()
         ->where('name', 'LIKE', "%{$word}%")
         ->orWhere('description', 'LIKE', "%{$word}%")
         ->get();
 
 
-            $translatedProducts= $cart_products->map(function ($product)
+            $translatedProducts= $cart_products->map(function ($product)use($customer_cart,$customer)
+            {
+
+                if( !$product->carts )
                 {
-                    return
-                    [
-                        'id' => $product->id,
-                        'name' => $product->name,
-                        'description' => $product->description,
-                        'price'=>$product->price,
-                        'stock'=>$product->stock,
-                        'image' => $product->image,
-                        'quantity'=>$product->pivot->quantity
-                    ];
+                    $isInCart=false;
                 }
+                else
+                {
+                    $isInCart = $product->carts->pluck('id')->contains($customer_cart->id);
+                }
+
+                if(!$product->customers)
+                {
+                    $isFavorite=false;
+                }
+                else
+                {
+                    $isFavorite=$product->customers->pluck('id')->contains($customer->id);
+                }
+
+                return
+                [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'description' => $product->description,
+                    'category'=>$product->category->name,
+                    'price'=>$product->price,
+                    'store'=>$product->store->name,
+                    'store_image'=>$product->store->logo_image,
+                    'stock'=>$product->stock,
+                    'image' => $product->image,
+                    'isInCart'=>$isInCart,
+                    'isFavorite'=>$isFavorite
+                ];
+            }
             );
 
             $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
-            $message = $locale == 'ar' ? 'نتائج البحث في هذه السلة.' : 'search result in this cart';  
+            $message = $locale == 'ar' ? 'نتائج البحث في هذه السلة.' : 'search result in this cart';
 
         return response()->json(
             [

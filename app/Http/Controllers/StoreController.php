@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Store;
 use Illuminate\Http\Request;
 use App\Http\Middleware\SetLocale;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Customer;
 class StoreController extends Controller
 {
     /**
@@ -27,7 +29,7 @@ class StoreController extends Controller
                 'id'=>$store->id,
                 'name' => $store->name,
                 'address'=>$store->address,
-                'image'=>$store->image
+                'image'=>$store->logo_image
                 ];
             }
             );
@@ -58,7 +60,9 @@ class StoreController extends Controller
     {
 
         $locale = app()->getLocale();
-
+        $user=Auth::user();
+        $customer=Customer::where('user_id',$user->id)->first();
+        $customer_cart=$customer->cart;
         $store=Store::where('id',$id)->first();
 
         if(!$store)
@@ -74,19 +78,44 @@ class StoreController extends Controller
             ],400);
         }
 
-        $products =$store->products->map(function ($product)
+        $products =$store->products->map(function ($product)use($customer_cart,$customer)
         {
+
+            if( !$product->carts )
+            {
+                $isInCart=false;
+            }
+            else
+            {
+                $isInCart = $product->carts->pluck('id')->contains($customer_cart->id);
+            }
+
+            if(!$product->customers)
+            {
+                $isFavorite=false;
+            }
+            else
+            {
+                $isFavorite=$product->customers->pluck('id')->contains($customer->id);
+            }
+
             return
             [
                 'id' => $product->id,
                 'name' => $product->name,
-                'description' => $product->desciption,
+                'description' => $product->description,
+                'category'=>$product->category->name,
                 'price'=>$product->price,
+                'store'=>$product->store->name,
+                'store_image'=>$product->store->logo_image,
                 'stock'=>$product->stock,
                 'image' => $product->image,
+                'isInCart'=>$isInCart,
+                'isFavorite'=>$isFavorite
             ];
         }
-        );
+    );
+
 
         $status = $locale == 'ar' ? 'تم بنجاح' : 'Success';
         $message = $locale == 'ar' ? 'تم جلب البيانات بنجاح.' : 'Data has been fetched successfully.';
@@ -114,12 +143,14 @@ class StoreController extends Controller
     {
         //
     }
-    
+
     public function search(Request $request, $id)
     {
 
         $locale = app()->getLocale();
-
+        $user=Auth::user();
+        $customer=Customer::where('user_id',$user->id)->first();
+        $customer_cart=$customer->cart;
         $word = $request->input('q');
 
         $store=Store::where('id',$id)->first();
@@ -140,19 +171,43 @@ class StoreController extends Controller
         ->orWhere('description', 'LIKE', "%{$word}%")
         ->get();
 
-            $translatedProducts= $store_products ->map(function ($product)
+            $translatedProducts= $store_products ->map(function ($product)use($customer_cart,$customer)
+            {
+
+                if( !$product->carts )
                 {
+                    $isInCart=false;
+                }
+                else
+                {
+                    $isInCart = $product->carts->pluck('id')->contains($customer_cart->id);
+                }
+
+                if(!$product->customers)
+                {
+                    $isFavorite=false;
+                }
+                else
+                {
+                    $isFavorite=$product->customers->pluck('id')->contains($customer->id);
+                }
+
                 return
                 [
                     'id' => $product->id,
                     'name' => $product->name,
                     'description' => $product->description,
+                    'category'=>$product->category->name,
                     'price'=>$product->price,
+                    'store'=>$product->store->name,
+                    'store_image'=>$product->store->logo_image,
                     'stock'=>$product->stock,
                     'image' => $product->image,
+                    'isInCart'=>$isInCart,
+                    'isFavorite'=>$isFavorite
                 ];
-                }
-            );
+            }
+        );
 
         $status = $locale == 'ar' ? 'تم بنجاح' : 'Success';
         $message = $locale == 'ar' ? 'نتيجة البحث في هذا المتجر ' : 'search result in this store.';
