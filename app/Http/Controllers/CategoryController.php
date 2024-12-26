@@ -34,8 +34,8 @@ class CategoryController extends Controller
 
         return  response()->json(
             [
-                $status,
-                $message,
+                'status'=>$status,
+                'message'=>$message,
                 'categories'=>$categories
             ]);
     }
@@ -63,8 +63,8 @@ class CategoryController extends Controller
 
             return  response()->json(
             [
-                $status,
-                $message
+                'status'=>$status,
+                'message'=>$message,
             ],400);
         }
         $products =$category->products->map(function ($product)
@@ -86,8 +86,8 @@ class CategoryController extends Controller
 
     return response()->json(
         [
-            $status,
-            $message,
+            'status'=>$status,
+            'message'=>$message,
             'products'=>$products
         ],200);
     }
@@ -120,8 +120,8 @@ class CategoryController extends Controller
             $message = $locale == 'ar' ? 'المتجر غير موجود.' : 'Store not found.';
 
             return response()->json([
-                $status,
-                $message
+                'status'=>$status,
+                'message'=>$message,
             ], 404);
         }
 
@@ -149,8 +149,8 @@ class CategoryController extends Controller
 
         return response()->json(
             [
-                $status,
-                $message,
+                'status'=>$status,
+                'message'=>$message,
                 'products' => $translatedProducts,
             ],200);
     }

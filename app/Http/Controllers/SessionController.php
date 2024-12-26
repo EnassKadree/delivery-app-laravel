@@ -40,8 +40,8 @@ class SessionController extends Controller
             $message = $locale == 'ar' ? 'الرقم المدخل خاطئ': 'The provided phone number is incorrect.';
 
             return response()->json([
-                $status,
-                $message
+                'status'=>$status,
+                'message'=>$message,
             ], 401);
         }
 
@@ -51,8 +51,8 @@ class SessionController extends Controller
             $message = $locale == 'ar' ? 'البريد الإلكتروني المعطى لا يتطابق مع رقم الهاتف ': 'The provided email does not match the phone number.';
 
             return response()->json([
-                $status,
-                $message
+                'status'=>$status,
+                'message'=>$message,
             ], 401);
         }
 
@@ -62,8 +62,8 @@ class SessionController extends Controller
             $message = $locale == 'ar' ? 'كلمة المرور المدخلة خاطئة': 'The provided password is incorrect.';
 
             return response()->json([
-                $status,
-                $message
+                'status'=>$status,
+                'message'=>$message,
             ], 401);
         }
 
@@ -77,8 +77,8 @@ class SessionController extends Controller
         $message = $locale == 'ar' ? 'تم جلب البيانات بنجاح.' : 'Data has been fetched successfully.';
 
         $response=[
-            $status,
-            $message,
+            'status'=>$status,
+            'message'=>$message,
             'user'=>$user,
             'token'=>$token
         ];
@@ -101,7 +101,7 @@ class SessionController extends Controller
         $locale = app()->getLocale();
 
         $user = User::find(Auth::id());
-        
+
         $customer=Customer::where('user_id',$user->id)->first();
 
         $attributes=request()->validate([

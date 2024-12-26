@@ -40,8 +40,8 @@ class RegisterController extends Controller
         if ($existingUser) {
             return response()->json(
                 [
-                    $status,
-                    $message
+                    'status'=>$status,
+                    'message'=>$message,
                 ], 400);
         }
         //create user
@@ -73,8 +73,8 @@ class RegisterController extends Controller
         $message = $locale == 'ar' ? 'تم التسجيل بنجاح! تم إرسال بريد إلكتروني للتأكيد.' : 'Registration successful! A verification email has been sent.';
 
         $response=[
-            $status,
-            $message,
+            'status'=>$status,
+            'message'=>$message,
             'customer'=>$customer,
             'token'=>$token
         ];
@@ -94,8 +94,8 @@ class RegisterController extends Controller
         $message = $locale == 'ar' ? 'تم جلب البيانات بنجاح.' : 'Data has been fetched successfully.';
 
         return response()->json([
-            $status,
-            $message,
+            'status'=>$status,
+            'message'=>$message,
             'customer' => [
                 'first_name' => $customer->first_name,
                 'last_name' => $customer->last_name,

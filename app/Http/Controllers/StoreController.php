@@ -37,8 +37,8 @@ class StoreController extends Controller
 
         return response()->json(
         [
-            $status,
-            $message,
+            'status'=>$status,
+            'message'=>$message,
             'stores'=>$stores
         ]);
     }
@@ -69,8 +69,8 @@ class StoreController extends Controller
 
             return  response()->json(
             [
-                $status,
-                $message,
+                'status'=>$status,
+                'message'=>$message,
             ],400);
         }
 
@@ -93,8 +93,8 @@ class StoreController extends Controller
 
         return response()->json(
             [
-            $status,
-            $message,
+                'status'=>$status,
+                'message'=>$message,
             'products'=>$products
             ],200);
     }
@@ -130,8 +130,8 @@ class StoreController extends Controller
             $message = $locale == 'ar' ? 'المتجر غير موجود' : 'Store not found.';
 
             return response()->json([
-                $status,
-                $message,
+                'status'=>$status,
+                'message'=>$message,
             ], 404);
         }
 
@@ -159,8 +159,8 @@ class StoreController extends Controller
 
         return response()->json(
             [
-                $status,
-                $message,
+                'status'=>$status,
+                'message'=>$message,
                 'products' => $translatedProducts,
             ],200);
     }

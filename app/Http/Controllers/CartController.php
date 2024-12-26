@@ -41,8 +41,8 @@ class CartController extends Controller
 
             return response()->json(
                 [
-                    $status,
-                    $message
+                    'status'=>$status,
+                    'message'=>$message,
                 ], 400);
         }
 
@@ -74,8 +74,8 @@ class CartController extends Controller
 
             return response()->json(
                 [
-                    $status, 
-                    $message
+                    'status'=>$status,
+                    'message'=>$message,
                 ], 201);
 
         }
@@ -95,8 +95,8 @@ class CartController extends Controller
 
                 return response()->json(
                     [
-                        $status,
-                        $message
+                        'status'=>$status,
+                        'message'=>$message,
                     ], 400);
             }
 
@@ -118,8 +118,8 @@ class CartController extends Controller
 
             return response()->json(
                 [
-                    $status,
-                    $message,
+                    'status'=>$status,
+                    'message'=>$message,
                 'qua'=> $row->quantity+1
                 ], 200);
 
@@ -161,8 +161,8 @@ class CartController extends Controller
     
         return response()->json(
         [
-            $status,
-            $message,
+            'status'=>$status,
+            'message'=>$message,
             'products'=> $products
         ], 200);
 
@@ -200,8 +200,8 @@ class CartController extends Controller
                 $message = $locale == 'ar' ? 'غير موجود': 'does not exist.';
                 return response()->json(
                 [
-                    $status,
-                    $message
+                    'status'=>$status,
+                    'message'=>$message,
                 ], 400);
             }
 
@@ -220,8 +220,8 @@ class CartController extends Controller
         $message = $locale == 'ar' ? 'تم حذف المنتج من السلة.' : 'product has been deleted from cart.';         
 
         return response([
-            $status,
-            $message
+            'status'=>$status,
+            'message'=>$message,
         ], 200);
     }
 
@@ -249,8 +249,8 @@ class CartController extends Controller
 
             return response()->json(
                 [
-                    $status, 
-                    $message
+                    'status'=>$status,
+                    'message'=>$message,
                 ], 400);
             }
 
@@ -276,8 +276,8 @@ class CartController extends Controller
 
                 return response()->json(
                     [
-                        $status,
-                        $message,
+                        'status'=>$status,
+                        'message'=>$message,
                         'qua'=> $row->quantity-1
                     ], 200);
 
@@ -288,8 +288,8 @@ class CartController extends Controller
             $message = $locale == 'ar' ? 'تم حذف المنتج من السلة.' : 'product has been deleted from cart.';  
 
             return response([
-                $status,
-                $message
+                'status'=>$status,
+                'message'=>$message,
             ], 200);
     }
 
@@ -331,8 +331,8 @@ class CartController extends Controller
 
         return response()->json(
             [
-                $status,
-                $message,
+                'status'=>$status,
+                'message'=>$message,
                 'products' => $translatedProducts,
             ],200);
     }
