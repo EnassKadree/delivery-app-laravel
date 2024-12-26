@@ -17,7 +17,7 @@ class CategoryController extends Controller
 
     public function index()
     {
-
+        $locale =app()->getLocale();
         $categories =Category::all()->map(function ($category)
         {
             return
@@ -28,11 +28,15 @@ class CategoryController extends Controller
             ];
         }
         );
+
+        $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
+        $message = $locale == 'ar' ? 'تم جلب البيانات بنجاح.' : 'Data has been fetched successfully.';  
+
         return  response()->json(
             [
-            'Status' => 'Success',
-            'Message' => 'Data has been fetched successfuly.',
-            'categories'=>$categories
+                $status,
+                $message,
+                'categories'=>$categories
             ]);
     }
 
@@ -49,15 +53,19 @@ class CategoryController extends Controller
      */
     public function show(string $id)
     {
-
+        $locale =app()->getLocale();
         $category=Category::where('id',$id)->first();
         if(!$category)
         {
-        return  response()->json(
-        [
-            'Status' => 'Failed',
-            'Message' => 'There is no such  category.',
-        ],400);
+
+            $status = $locale == 'ar' ? 'فشل' : 'Failed';
+            $message = $locale == 'ar' ? 'لا توجد فئة كهذه.' : 'There is no such  category.';
+
+            return  response()->json(
+            [
+                $status,
+                $message
+            ],400);
         }
         $products =$category->products->map(function ($product)
         {
@@ -73,11 +81,14 @@ class CategoryController extends Controller
         }
     );
 
+    $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
+    $message = $locale == 'ar' ? 'تم جلب البيانات بنجاح.' : 'Data has been fetched successfully.'; 
+
     return response()->json(
         [
-        'Status' => 'Success',
-        'Message' => 'Data has been fetched successfuly.',
-        'products'=>$products
+            $status,
+            $message,
+            'products'=>$products
         ],200);
     }
 
@@ -98,14 +109,19 @@ class CategoryController extends Controller
     }
     public function search(Request $request, $id)
     {
+        $locale =app()->getLocale();
         $word = $request->input('q');
 
         $category=Category::where('id',$id)->first();
         if (!$category)
         {
+
+            $status = $locale == 'ar' ? 'خطأ' : 'Error';
+            $message = $locale == 'ar' ? 'المتجر غير موجود.' : 'Store not found.';
+
             return response()->json([
-                'Status' => 'Error',
-                'message' => 'Store not found',
+                $status,
+                $message
             ], 404);
         }
 
@@ -128,11 +144,14 @@ class CategoryController extends Controller
                 }
             );
 
+            $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
+            $message = $locale == 'ar' ? 'نتيجة البحث في هذه الفئة.' : 'search result in this category'; 
+
         return response()->json(
             [
-            'Status' => 'Success',
-            "message"=>'search result in this category',
-            'products' => $translatedProducts,
+                $status,
+                $message,
+                'products' => $translatedProducts,
             ],200);
     }
 }

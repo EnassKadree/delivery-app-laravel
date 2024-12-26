@@ -22,6 +22,7 @@ class RegisterController extends Controller
 
     public function store(Request $request)
     {
+        $locale = app()->getLocale();
         //validate
         $attributes=$request->validate([
             'first_name'=>['required'],
@@ -33,11 +34,14 @@ class RegisterController extends Controller
         ]);
         $existingUser = User::where('phone', $attributes['phone'])->first();
 
+        $status = $locale == 'ar' ? 'فشل' : 'Failed';
+        $message = $locale == 'ar' ? 'رقم الهاتف موجود بالفعل' : 'Phone number already exists.';
+
         if ($existingUser) {
             return response()->json(
                 [
-                'Status' => 'Failed',
-                'message' => 'Phone number already exists.'
+                    $status,
+                    $message
                 ], 400);
         }
         //create user
@@ -64,9 +68,13 @@ class RegisterController extends Controller
         $token=$user->createToken('usertoken')->plainTextToken;
         //log in
         Auth::login($customer);
+
+        $status = $locale == 'ar' ? 'تم بنجاح' : 'Success';
+        $message = $locale == 'ar' ? 'تم التسجيل بنجاح! تم إرسال بريد إلكتروني للتأكيد.' : 'Registration successful! A verification email has been sent.';
+
         $response=[
-            'Status' => 'Success',
-            'message' => 'Registration successful! A verification email has been sent.',
+            $status,
+            $message,
             'customer'=>$customer,
             'token'=>$token
         ];
@@ -78,11 +86,16 @@ class RegisterController extends Controller
      */
     public function show()
     {
+        $locale = app()->getLocale();
         $user=Auth::user();
         $customer=Customer::where('user_id',$user->id)->first();
+
+        $status = $locale == 'ar' ? 'تم بنجاح' : 'Success';
+        $message = $locale == 'ar' ? 'تم جلب البيانات بنجاح.' : 'Data has been fetched successfully.';
+
         return response()->json([
-            'Status' => 'Success',
-            'Message' => 'Data has been fetched successfuly.',
+            $status,
+            $message,
             'customer' => [
                 'first_name' => $customer->first_name,
                 'last_name' => $customer->last_name,

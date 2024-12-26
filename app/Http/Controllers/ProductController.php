@@ -6,7 +6,10 @@ use App\Models\Product;
 use App\Models\Store;
 use Illuminate\Http\Request;
 use App\Http\Middleware\SetLocale;
-
+use Illuminate\Support\Facades\Auth;
+use App\Models\Customer;
+use Illuminate\Support\Collection;
+use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
 
 class ProductController extends Controller
 {
@@ -22,8 +25,32 @@ class ProductController extends Controller
     public function index()
     {
 
-        $products =Product::latest()->take(20)->get()->map(function ($product)
+        $locale = app()->getLocale();
+
+        $user=Auth::user();
+        $customer=Customer::where('user_id',$user->id)->first();
+        $customer_cart=$customer->cart;
+        $products =Product::latest()->take(20)->get()->map(function ($product)use($customer_cart,$customer)
         {
+
+            if( !$product->carts )
+            {
+                $isInCart=false;
+            }
+            else
+            {
+                $isInCart = $product->carts->pluck('id')->contains($customer_cart->id);
+            }
+
+            if(!$product->customers)
+            {
+                $isFavorite=false;
+            }
+            else
+            {
+                $isFavorite=$product->customers->pluck('id')->contains($customer->id);
+            }
+
             return
             [
                 'id' => $product->id,
@@ -34,13 +61,21 @@ class ProductController extends Controller
                 'store'=>$product->store->name,
                 'stock'=>$product->stock,
                 'image' => $product->image,
+                'isInCart'=>$isInCart,
+                'isFavorite'=>$isFavorite
             ];
         }
         );
+
+        $status = $locale == 'ar' ? 'تم بنجاح' : 'Success';
+        $message = $locale == 'ar' ? 'تم جلب البيانات بنجاح.' : 'Data has been fetched successfully.';
+
+
+
         return response()->json(
         [
-            'Status' => 'Success',
-            'Message' => 'Data has been fetched successfuly.',
+            'status' => $status,
+            'message' => $message,
             'products'=> $products
         ]
         );
@@ -62,10 +97,32 @@ class ProductController extends Controller
     {
         $locale =app()->getLocale();
 
+        $user=Auth::user();
+        $customer=Customer::where('user_id',$user->id)->first();
+        $customer_cart=$customer->cart;
+
         $product=Product::where('id',$id)->first();
 
         if ($product)
         {
+            if( !$product->carts )
+            {
+                $isInCart=false;
+            }
+            else
+            {
+                $isInCart = $product->carts->pluck('id')->contains($customer_cart->id);
+            }
+
+            if(!$product->customers)
+            {
+                $isFavorite=false;
+            }
+            else
+            {
+                $isFavorite=$product->customers->pluck('id')->contains($customer->id);
+            }
+
             $translatedProduct = [
                 'id' => $product->id,
                 'name' => $product->name,
@@ -76,16 +133,26 @@ class ProductController extends Controller
                 'store'=>$product->store->name,
                 'image' => $product->image,
             ];
+
+            $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
+            $message = $locale == 'ar' ? 'تم جلب البيانات بنجاح.' : 'Data has been fetched successfully.';            
+
             return response()->json(
             [
-                'Status' => 'Success',
-                'Message' => 'Data has been fetched successfuly.',
-                'product'=>$translatedProduct
+                'status' => $status,
+                'message' => $message,
+                'product'=>$translatedProduct,
+                'isInCart'=>$isInCart,
+                'isFavorite'=>$isFavorite
             ], 200);
         }
+
+        $status = $locale == 'ar' ? 'فشل' : 'Failed';
+        $message = $locale == 'ar' ? 'المنتج غير موجود' : 'Product not found.'; 
+
         return response()->json([
-            'Status' => 'Failed',
-            'message' => 'Product not found'
+            'status' => $status,
+            'message' => $message,
         ], 404);
     }
 
@@ -106,6 +173,7 @@ class ProductController extends Controller
     }
     public function search(Request $request)
     {
+        $locale =app()->getLocale();
 
         $word = $request->input('q');
 
@@ -139,9 +207,12 @@ class ProductController extends Controller
                 ];
             }
             );
+
+            $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
+
         return response()->json(
             [
-            'Status' => 'Success',
+                'status' => $status,
             'products' => $translatedProducts,
             'stores' => $translatedStores,
             ],200);

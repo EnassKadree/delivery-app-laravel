@@ -24,6 +24,8 @@ class CartController extends Controller
      */
     public function addToCart(Request $request,$id)
     {
+        $locale =app()->getLocale();
+
         $product=Product::where('id',$id)->first();
         $user=Auth::user();
         $customer=Customer::where('user_id',$user->id)->first();
@@ -33,10 +35,14 @@ class CartController extends Controller
         //checking if product is available
         if ($stock==0 )
         {
+
+            $status = $locale == 'ar' ? ' فشل' : 'Failed';
+            $message = $locale == 'ar' ? 'نفدت الكمية.' : 'out of stock.'; 
+
             return response()->json(
                 [
-                'Status' => 'Failed',
-                'message' => 'out of stock'
+                    $status,
+                    $message
                 ], 400);
         }
 
@@ -54,7 +60,7 @@ class CartController extends Controller
                 'product_id'=>$product->id,
                 'cart_id'=>$customer_cart->id,
                 'quantity'=>1
-                 ]);
+                ]);
 
                 // update the total price
             $updatedPrice=$customer_cart->total_price+$product->price;
@@ -62,10 +68,14 @@ class CartController extends Controller
             $customer_cart->update(
                 ['total_price' => $updatedPrice]
             );
+
+            $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
+            $message = $locale == 'ar' ? 'تم إضافة المنتج إلى السلة بنجاح.' : 'added to cart successfully.'; 
+
             return response()->json(
                 [
-                'Status' => 'Success',
-                'message' => 'added to cart successfully',
+                    $status, 
+                    $message
                 ], 201);
 
         }
@@ -79,10 +89,14 @@ class CartController extends Controller
 
             if ($stock == $row->quantity)
             {
+
+                $status = $locale == 'ar' ? ' فشل' : 'Failed';
+                $message = $locale == 'ar' ? 'نفدت الكمية.' : 'out of stock.';
+
                 return response()->json(
                     [
-                    'Status' => 'Failed',
-                    'message' => 'out of stock'
+                        $status,
+                        $message
                     ], 400);
             }
 
@@ -99,10 +113,13 @@ class CartController extends Controller
                     ['total_price' => $updatedPrice]
                 );
 
-             return response()->json(
+                $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
+                $message = $locale == 'ar' ? 'تم إضافة المنتج إلى السلة بنجاح.' : 'added to cart successfully.'; 
+
+            return response()->json(
                 [
-                'Status' => 'Success',
-                'message' => 'added to cart successfully',
+                    $status,
+                    $message,
                 'qua'=> $row->quantity+1
                 ], 200);
 
@@ -117,6 +134,8 @@ class CartController extends Controller
      */
     public function show()
     {
+        $locale =app()->getLocale();
+
         $user=Auth::user();
         $customer=Customer::where('user_id',$user->id)->first();
         $customer_cart=$customer->cart;
@@ -135,12 +154,16 @@ class CartController extends Controller
                 'quantity'=>$product->pivot->quantity
             ];
         }
-       );
-       return response()->json(
+    );
+
+        $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
+        $message = $locale == 'ar' ? 'المنتج في هذه السلة' : 'product in this cart.'; 
+    
+        return response()->json(
         [
-        'Status' => 'Success',
-        'message' => 'product in this cart',
-        'products'=> $products
+            $status,
+            $message,
+            'products'=> $products
         ], 200);
 
     }
@@ -157,8 +180,10 @@ class CartController extends Controller
      * Remove the specified resource from storage.
      */
 
-     public function destroy($id)
-     {
+    public function destroy($id)
+    {
+        $locale =app()->getLocale();
+
         $product=Product::where('id',$id)->first();
         $user=Auth::user();
         $customer=Customer::where('user_id',$user->id)->first();
@@ -171,11 +196,12 @@ class CartController extends Controller
 
         if (!$row)
             {
-
-            return response()->json(
+                $status = $locale == 'ar' ? ' فشل' : 'Failed';
+                $message = $locale == 'ar' ? 'غير موجود': 'does not exist.';
+                return response()->json(
                 [
-                'Status' => 'Failed',
-                'message' => 'does not exist'
+                    $status,
+                    $message
                 ], 400);
             }
 
@@ -190,16 +216,21 @@ class CartController extends Controller
 
         $customer_cart->products()->detach($product->id);
 
+        $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
+        $message = $locale == 'ar' ? 'تم حذف المنتج من السلة.' : 'product has been deleted from cart.';         
+
         return response([
-            'Status' => 'Success',
-            'Message' => 'product has been deleted from cart.'
+            $status,
+            $message
         ], 200);
-     }
+    }
 
 
 
     public function removeOneItem($id)
     {
+        $locale =app()->getLocale();
+
         $product=Product::where('id',$id)->first();
         $user=Auth::user();
         $customer=Customer::where('user_id',$user->id)->first();
@@ -213,10 +244,13 @@ class CartController extends Controller
             if (!$row)
             {
 
+                $status = $locale == 'ar' ? ' فشل' : 'Failed';
+                $message = $locale == 'ar' ? 'غير موجود': 'does not exist.';
+
             return response()->json(
                 [
-                'Status' => 'Failed',
-                'message' => 'does not exist'
+                    $status, 
+                    $message
                 ], 400);
             }
 
@@ -236,19 +270,26 @@ class CartController extends Controller
                 ->update([
                     'quantity' =>$row->quantity - 1,
                 ]);
+
+                $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
+                $message = $locale == 'ar' ? 'تم حذف المنتج ' : 'product is removed.';   
+
                 return response()->json(
                     [
-                    'Status' => 'Success',
-                    'message' => 'product is removed',
-                    'qua'=> $row->quantity-1
+                        $status,
+                        $message,
+                        'qua'=> $row->quantity-1
                     ], 200);
 
             }
             $customer_cart->products()->detach($product->id);
 
+            $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
+            $message = $locale == 'ar' ? 'تم حذف المنتج من السلة.' : 'product has been deleted from cart.';  
+
             return response([
-                'Status' => 'Success',
-                'Message' => 'product has been deleted from cart.'
+                $status,
+                $message
             ], 200);
     }
 
@@ -256,6 +297,8 @@ class CartController extends Controller
 
     public function search(Request $request)
     {
+        $locale =app()->getLocale();
+
         $word = $request->input('q');
 
         $user=Auth::user();
@@ -283,11 +326,14 @@ class CartController extends Controller
                 }
             );
 
+            $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
+            $message = $locale == 'ar' ? 'نتائج البحث في هذه السلة.' : 'search result in this cart';  
+
         return response()->json(
             [
-            'Status' => 'Success',
-            "message"=>'search result in this cart',
-            'products' => $translatedProducts,
+                $status,
+                $message,
+                'products' => $translatedProducts,
             ],200);
     }
 }

@@ -22,7 +22,7 @@ class Customer extends Model implements AuthenticatableContract
 
     public function favorites()
     {
-        return $this->belongsToMany(Product::class, 'favorites', 'product_id', 'customer_id');
+        return $this->belongsToMany(Product::class, 'favorites', 'customer_id', 'product_id');
     }
 
     public function cart()

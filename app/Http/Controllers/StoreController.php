@@ -18,6 +18,7 @@ class StoreController extends Controller
 
     public function index()
     {
+        $locale = app()->getLocale();
 
         $stores =Store::all()->map(function ($store)
             {
@@ -30,11 +31,15 @@ class StoreController extends Controller
                 ];
             }
             );
+
+        $status = $locale == 'ar' ? 'تم بنجاح' : 'Success';
+        $message = $locale == 'ar' ? 'تم جلب البيانات بنجاح.' : 'Data has been fetched successfully.';
+
         return response()->json(
         [
-        'Status' => 'Success',
-        'Message' => 'Data has been fetched successfuly.',
-        'stores'=>$stores
+            $status,
+            $message,
+            'stores'=>$stores
         ]);
     }
 
@@ -52,14 +57,20 @@ class StoreController extends Controller
     public function show(string $id)
     {
 
+        $locale = app()->getLocale();
+
         $store=Store::where('id',$id)->first();
 
         if(!$store)
         {
+
+            $status = $locale == 'ar' ? 'فشل' : 'Failed';
+            $message = $locale == 'ar' ? 'هذا المتجر غير موجود' : 'There is no such  store.';
+
             return  response()->json(
             [
-                'Status' => 'Failed',
-                'Message' => 'There is no such  store.',
+                $status,
+                $message,
             ],400);
         }
 
@@ -77,10 +88,13 @@ class StoreController extends Controller
         }
         );
 
+        $status = $locale == 'ar' ? 'تم بنجاح' : 'Success';
+        $message = $locale == 'ar' ? 'تم جلب البيانات بنجاح.' : 'Data has been fetched successfully.';
+
         return response()->json(
             [
-            'Status' => 'Success',
-            'Message' => 'Data has been fetched successfuly.',
+            $status,
+            $message,
             'products'=>$products
             ],200);
     }
@@ -103,14 +117,21 @@ class StoreController extends Controller
     
     public function search(Request $request, $id)
     {
+
+        $locale = app()->getLocale();
+
         $word = $request->input('q');
 
         $store=Store::where('id',$id)->first();
         if (!$store)
         {
+
+            $status = $locale == 'ar' ? 'خطأ' : 'Error';
+            $message = $locale == 'ar' ? 'المتجر غير موجود' : 'Store not found.';
+
             return response()->json([
-                'Status' => 'Error',
-                'message' => 'Store not found',
+                $status,
+                $message,
             ], 404);
         }
 
@@ -133,11 +154,14 @@ class StoreController extends Controller
                 }
             );
 
+        $status = $locale == 'ar' ? 'تم بنجاح' : 'Success';
+        $message = $locale == 'ar' ? 'نتيجة البحث في هذا المتجر ' : 'search result in this store.';
+
         return response()->json(
             [
-            'Status' => 'Success',
-            "message"=>'search result in this store',
-            'products' => $translatedProducts,
+                $status,
+                $message,
+                'products' => $translatedProducts,
             ],200);
     }
 }

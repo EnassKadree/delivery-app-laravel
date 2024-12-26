@@ -36,8 +36,8 @@ Route::get('/stores',[StoreController::class,'index']);
 Route::get('/stores/{id}',[StoreController::class,'show']);
 Route::get('/store/search/{id}',[StoreController::class,'search']);
 
-Route::get('/products',[ProductController::class,'index']);
-Route::get('/products/{id}',[ProductController::class,'show']);
+Route::get('/products',[ProductController::class,'index'])->middleware('auth:sanctum');
+Route::get('/products/{id}',[ProductController::class,'show'])->middleware('auth:sanctum');
 Route::get('/search', [ProductController::class,'search']);
 
 Route::post('/Favorite/add/{id}',[FavoriteController::class,'store'])->middleware('auth:sanctum');
