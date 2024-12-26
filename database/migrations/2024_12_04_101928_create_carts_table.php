@@ -16,20 +16,19 @@ return new class extends Migration
     {
         Schema::create('carts', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Customer::class);
+            $table->foreignIdFor(Customer::class)->constrained()->onDelete('cascade');
             $table->double('total_price');
             $table->timestamps();
         });
 
         Schema::create('cart_item', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Product::class);
-            $table->foreignIdFor(Cart::class);
+            $table->foreignIdFor(Product::class)->constrained()->onDelete('cascade');
+            $table->foreignIdFor(Cart::class)->constrained()->onDelete('cascade');
             $table->unsignedInteger('quantity');
             $table->timestamps();
         });
     }
-
 
     /**
      * Reverse the migrations.

@@ -20,7 +20,7 @@ return new class extends Migration
 
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Store::class);
+            $table->foreignIdFor(Store::class)->constrained()->onDelete('cascade');
             $table->json('name');
             $table->json('description');
             $table->double('price');
@@ -32,8 +32,8 @@ return new class extends Migration
 
         Schema::create('favorites', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Product::class);
-            $table->foreignIdFor(Customer::class);
+            $table->foreignIdFor(Product::class)->constrained()->onDelete('cascade');
+            $table->foreignIdFor(Customer::class)->constrained()->onDelete('cascade');
             $table->timestamps();
         });
 

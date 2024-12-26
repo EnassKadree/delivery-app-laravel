@@ -9,12 +9,12 @@ class Customer extends Model implements AuthenticatableContract
 {
     use  Authenticatable;
     protected $guarded=[];
-    
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-    
+
     public function orders()
     {
         return $this->hasMany(Order::class);
@@ -29,4 +29,5 @@ class Customer extends Model implements AuthenticatableContract
     {
         return $this->hasOne(Cart::class);
     }
+    
 }

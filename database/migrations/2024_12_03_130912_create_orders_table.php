@@ -20,14 +20,14 @@ return new class extends Migration
             $table->id();
             $table->enum('status', ['pending', 'inProgress','completed'])->default('pending');
             $table->double('total_price');
-            $table->foreignIdFor(Customer::class);
+            $table->foreignIdFor(Customer::class)->constrained()->onDelete('cascade');
             $table->timestamps();
                 });
 
         Schema::create('order_item', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Product::class);
-            $table->foreignIdFor(Order::class);
+            $table->foreignIdFor(Order::class)->constrained()->onDelete('cascade');
             $table->unsignedInteger('quantity');
             $table->timestamps();
         });

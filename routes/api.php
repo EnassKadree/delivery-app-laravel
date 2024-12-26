@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
@@ -23,16 +25,30 @@ Route::post('/register',[RegisterController::class,'store']);
 Route::get('/show',[RegisterController::class,'show'])->middleware('auth:sanctum');
 
 Route::post('/login',[SessionController::class,'store']);
+Route::post('/update',[SessionController::class,'update'])->middleware('auth:sanctum');;
+
 
 Route::get('/categories',[CategoryController::class,'index']);
 Route::get('/categories/{id}',[CategoryController::class,'show']);
+Route::get('/category/search/{id}',[CategoryController::class,'search']);
 
 Route::get('/stores',[StoreController::class,'index']);
 Route::get('/stores/{id}',[StoreController::class,'show']);
+Route::get('/store/search/{id}',[StoreController::class,'search']);
 
 Route::get('/products',[ProductController::class,'index']);
 Route::get('/products/{id}',[ProductController::class,'show']);
 Route::get('/search', [ProductController::class,'search']);
+
+Route::post('/Favorite/add/{id}',[FavoriteController::class,'store'])->middleware('auth:sanctum');
+Route::get('/Favorites',[FavoriteController::class,'index'])->middleware('auth:sanctum');
+Route::delete('/Favorite/delete/{id}',[FavoriteController::class,'destroy'])->middleware('auth:sanctum');
+
+Route::post('/Cart/add/{id}',[CartController::class,'addToCart'])->middleware('auth:sanctum');
+Route::get('/Cart/show',[CartController::class,'show'])->middleware('auth:sanctum');
+Route::delete('/Cart/delete/one/{id}',[CartController::class,'removeOneItem'])->middleware('auth:sanctum');
+Route::delete('/Cart/delete/{id}',[CartController::class,'destroy'])->middleware('auth:sanctum');
+Route::get('/cart/search', [CartController::class,'search'])->middleware('auth:sanctum');
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
