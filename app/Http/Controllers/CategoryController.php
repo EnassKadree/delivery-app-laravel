@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Http\Middleware\SetLocale;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Customer;
 class CategoryController extends Controller
 {
     /**
@@ -17,7 +19,7 @@ class CategoryController extends Controller
 
     public function index()
     {
-
+        $locale =app()->getLocale();
         $categories =Category::all()->map(function ($category)
         {
             return
@@ -28,11 +30,15 @@ class CategoryController extends Controller
             ];
         }
         );
+
+        $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
+        $message = $locale == 'ar' ? 'تم جلب البيانات بنجاح.' : 'Data has been fetched successfully.';
+
         return  response()->json(
             [
-            'Status' => 'Success',
-            'Message' => 'Data has been fetched successfuly.',
-            'categories'=>$categories
+                'status'=>$status,
+                'message'=>$message,
+                'categories'=>$categories
             ]);
     }
 
@@ -49,35 +55,70 @@ class CategoryController extends Controller
      */
     public function show(string $id)
     {
+        $locale =app()->getLocale();
 
+        $user=Auth::user();
+        $customer=Customer::where('user_id',$user->id)->first();
+        $customer_cart=$customer->cart;
         $category=Category::where('id',$id)->first();
         if(!$category)
         {
-        return  response()->json(
-        [
-            'Status' => 'Failed',
-            'Message' => 'There is no such  category.',
-        ],400);
+
+            $status = $locale == 'ar' ? 'فشل' : 'Failed';
+            $message = $locale == 'ar' ? 'لا توجد فئة كهذه.' : 'There is no such  category.';
+
+            return  response()->json(
+            [
+                'status'=>$status,
+                'message'=>$message,
+            ],400);
         }
-        $products =$category->products->map(function ($product)
+        $products =$category->products->map(function ($product)use($customer_cart,$customer)
         {
+
+            if( !$product->carts )
+            {
+                $isInCart=false;
+            }
+            else
+            {
+                $isInCart = $product->carts->pluck('id')->contains($customer_cart->id);
+            }
+
+            if(!$product->customers)
+            {
+                $isFavorite=false;
+            }
+            else
+            {
+                $isFavorite=$product->customers->pluck('id')->contains($customer->id);
+            }
+
             return
             [
                 'id' => $product->id,
                 'name' => $product->name,
                 'description' => $product->description,
+                'category'=>$product->category->name,
                 'price'=>$product->price,
+                'store'=>$product->store->name,
+                'store_image'=>$product->store->logo_image,
                 'stock'=>$product->stock,
                 'image' => $product->image,
+                'isInCart'=>$isInCart,
+                'isFavorite'=>$isFavorite
             ];
         }
     );
 
+    $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
+    $message = $locale == 'ar' ? 'تم جلب البيانات بنجاح.' : 'Data has been fetched successfully.';
+
     return response()->json(
         [
-        'Status' => 'Success',
-        'Message' => 'Data has been fetched successfuly.',
-        'products'=>$products
+            'status'=>$status,
+            'message'=>$message,
+            'products'=>$products
         ],200);
     }
 
@@ -98,14 +139,21 @@ class CategoryController extends Controller
     }
     public function search(Request $request, $id)
     {
+        $locale =app()->getLocale();
+        $user=Auth::user();
+        $customer=Customer::where('user_id',$user->id)->first();
+        $customer_cart=$customer->cart;
         $word = $request->input('q');
-
         $category=Category::where('id',$id)->first();
         if (!$category)
         {
+
+            $status = $locale == 'ar' ? 'خطأ' : 'Error';
+            $message = $locale == 'ar' ? 'المتجر غير موجود.' : 'Store not found.';
+
             return response()->json([
-                'Status' => 'Error',
-                'message' => 'Store not found',
+                'status'=>$status,
+                'message'=>$message,
             ], 404);
         }
 
@@ -114,25 +162,53 @@ class CategoryController extends Controller
         ->orWhere('description', 'LIKE', "%{$word}%")
         ->get();
 
-            $translatedProducts= $category_products ->map(function ($product)
+            $translatedProducts= $category_products ->map(function ($product)use($customer_cart,$customer)
+            {
+
+                if( !$product->carts )
                 {
+                    $isInCart=false;
+                }
+                else
+                {
+                    $isInCart = $product->carts->pluck('id')->contains($customer_cart->id);
+                }
+
+                if(!$product->customers)
+                {
+                    $isFavorite=false;
+                }
+                else
+                {
+                    $isFavorite=$product->customers->pluck('id')->contains($customer->id);
+                }
+
                 return
                 [
                     'id' => $product->id,
                     'name' => $product->name,
                     'description' => $product->description,
+                    'category'=>$product->category->name,
                     'price'=>$product->price,
+                    'store'=>$product->store->name,
+                    'store_image'=>$product->store->logo_image,
                     'stock'=>$product->stock,
                     'image' => $product->image,
+                    'isInCart'=>$isInCart,
+                    'isFavorite'=>$isFavorite
                 ];
-                }
-            );
+            }
+        );
+
+
+            $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
+            $message = $locale == 'ar' ? 'نتيجة البحث في هذه الفئة.' : 'search result in this category';
 
         return response()->json(
             [
-            'Status' => 'Success',
-            "message"=>'search result in this category',
-            'products' => $translatedProducts,
+                'status'=>$status,
+                'message'=>$message,
+                'products' => $translatedProducts,
             ],200);
     }
 }

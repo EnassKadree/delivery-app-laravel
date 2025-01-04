@@ -29,16 +29,16 @@ Route::post('/update',[SessionController::class,'update'])->middleware('auth:san
 
 
 Route::get('/categories',[CategoryController::class,'index']);
-Route::get('/categories/{id}',[CategoryController::class,'show']);
-Route::get('/category/search/{id}',[CategoryController::class,'search']);
+Route::get('/categories/{id}',[CategoryController::class,'show'])->middleware('auth:sanctum');;
+Route::get('/category/search/{id}',[CategoryController::class,'search'])->middleware('auth:sanctum');;
 
 Route::get('/stores',[StoreController::class,'index']);
-Route::get('/stores/{id}',[StoreController::class,'show']);
-Route::get('/store/search/{id}',[StoreController::class,'search']);
+Route::get('/stores/{id}',[StoreController::class,'show'])->middleware('auth:sanctum');;
+Route::get('/store/search/{id}',[StoreController::class,'search'])->middleware('auth:sanctum');;
 
-Route::get('/products',[ProductController::class,'index']);
-Route::get('/products/{id}',[ProductController::class,'show']);
-Route::get('/search', [ProductController::class,'search']);
+Route::get('/products',[ProductController::class,'index'])->middleware('auth:sanctum');
+Route::get('/products/{id}',[ProductController::class,'show'])->middleware('auth:sanctum');
+Route::get('/search', [ProductController::class,'search'])->middleware('auth:sanctum');;
 
 Route::post('/Favorite/add/{id}',[FavoriteController::class,'store'])->middleware('auth:sanctum');
 Route::get('/Favorites',[FavoriteController::class,'index'])->middleware('auth:sanctum');
@@ -46,7 +46,7 @@ Route::delete('/Favorite/delete/{id}',[FavoriteController::class,'destroy'])->mi
 
 Route::post('/Cart/add/{id}',[CartController::class,'addToCart'])->middleware('auth:sanctum');
 Route::get('/Cart/show',[CartController::class,'show'])->middleware('auth:sanctum');
-Route::delete('/Cart/delete/one/{id}',[CartController::class,'removeOneItem'])->middleware('auth:sanctum');
+Route::post('/Cart/delete/one/{id}',[CartController::class,'removeOneItem'])->middleware('auth:sanctum');
 Route::delete('/Cart/delete/{id}',[CartController::class,'destroy'])->middleware('auth:sanctum');
 Route::get('/cart/search', [CartController::class,'search'])->middleware('auth:sanctum');
 

@@ -12,20 +12,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-
         Schema::disableForeignKeyConstraints();
 
         Schema::create('stores', function (Blueprint $table) {
             $table->id();
             $table->json('name');
             $table->json('address');
-            $table->string('logo_image');
-            $table->foreignIdFor(User::class);
+            $table->string('logo_image')->nullable();
+            $table->foreignIdFor(User::class)->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::enableForeignKeyConstraints();
-
     }
 
     /**

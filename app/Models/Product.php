@@ -24,9 +24,9 @@ class Product extends Model
     {
         return $this->belongsToMany(Order::class,'order_item','order_id','product_id');
     }
-    public function costumers()
+    public function customers()
     {
-        return $this->belongsToMany(Customer::class, 'favorites', 'customer_id', 'product_id');
+        return $this->belongsToMany(Customer::class, 'favorites', 'product_id', 'customer_id');
     }
 
     public function carts()

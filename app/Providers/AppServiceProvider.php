@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Providers;
+namespace App\Validator;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
@@ -22,9 +23,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);        
+        Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
         Route::middleware('api')
         ->prefix('api')
         ->group(base_path('routes/api.php'));
+        Validator::replacer('image', function ($message, $attribute, $rule, $parameters) {
+            return __('The :attribute must be a valid image.');
+        });
     }
 }

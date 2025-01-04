@@ -55,7 +55,7 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         'setlocale' => \App\Http\Middleware\SetLocale::class,
 
-        //'auth' => \App\Http\Middleware\Authenticate::class,
+        'auth' => \App\Http\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         //'can' => \Illuminate/Auth/Http/Middleware/Authorize::class,
@@ -63,5 +63,7 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        'admin' => \App\Http\Middleware\AdminMiddleware::class,
+        'redirect.authenticated' => \App\Http\Middleware\RedirectIfAuthenticated::class,
     ];
 }
