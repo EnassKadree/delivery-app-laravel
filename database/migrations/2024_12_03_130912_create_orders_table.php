@@ -18,8 +18,12 @@ return new class extends Migration
 
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->enum('status', ['pending', 'inProgress','completed'])->default('pending');
+            $table->json('status')->default(json_encode([
+                'en' => 'pending',
+                'ar' => 'قيد الانتظار',
+            ]));
             $table->double('total_price');
+            $table->string('address');
             $table->foreignIdFor(Customer::class)->constrained()->onDelete('cascade');
             $table->timestamps();
                 });

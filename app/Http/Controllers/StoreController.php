@@ -9,6 +9,9 @@ use App\Http\Requests\UpdateStoreRequest;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Customer;
+use Illuminate\Support\Facades\Log;
+
+
 class StoreController extends Controller
 {
     /**
@@ -47,9 +50,7 @@ class StoreController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
+
     public function show(string $id)
     {
 
@@ -224,7 +225,6 @@ class StoreController extends Controller
 
     public function store(StoreStoreRequest $request)
     {
-        \Log::info($request->all());
         $data = $request->validated();
         $data['name'] = json_encode($request->input('name'));
         $data['address'] = json_encode($request->input('address'));

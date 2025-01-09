@@ -1,12 +1,12 @@
 <?php
 
 namespace App\Providers;
-namespace App\Validator;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use Laravel\Sanctum\PersonalAccessToken;
 use Laravel\Sanctum\Sanctum;
+use Illuminate\Support\Facades\Validator;
 
 class AppServiceProvider extends ServiceProvider
 {

@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     protected $guarded=[];
+    protected $casts = [
+        'status' => 'array', 
+    ];
 
     public function customer()
     {
@@ -15,6 +18,6 @@ class Order extends Model
 
     public function products()
     {
-        return $this->belongsToMany(Product::class,'order_item','product_id','order_id');
+        return $this->belongsToMany(Product::class,'order_item','order_id','product_id')->withPivot('quantity');
     }
 }

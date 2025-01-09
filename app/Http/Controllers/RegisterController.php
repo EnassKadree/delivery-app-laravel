@@ -32,6 +32,7 @@ class RegisterController extends Controller
             'password'=>['required','confirmed'],
             'address'=>['required'],
         ]);
+        
         $existingUser = User::where('phone', $attributes['phone'])->first();
 
         $status = $locale == 'ar' ? 'فشل' : 'Failed';
@@ -64,7 +65,7 @@ class RegisterController extends Controller
             'customer_id'=>$customer->id,
             'total_price'=>0
         ]);
-        
+
         $token=$user->createToken('usertoken')->plainTextToken;
         //log in
         Auth::login($customer);

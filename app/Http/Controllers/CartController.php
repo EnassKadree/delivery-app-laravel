@@ -167,6 +167,10 @@ class CartController extends Controller
                 $isFavorite=$product->customers->pluck('id')->contains($customer->id);
             }
 
+            $row = DB::table('cart_item')
+            ->where('cart_id',$customer_cart->id )
+            ->where('product_id',$product->id )
+            ->first();
             return
             [
                 'id' => $product->id,
@@ -177,6 +181,7 @@ class CartController extends Controller
                 'store'=>$product->store->name,
                 'store_image'=>$product->store->logo_image,
                 'stock'=>$product->stock,
+                'quantity'=>$row->quantity,
                 'image' => $product->image,
                 'isInCart'=>$isInCart,
                 'isFavorite'=>$isFavorite

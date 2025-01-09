@@ -7,7 +7,7 @@ use Spatie\Translatable\HasTranslations;
 class Product extends Model
 {
     use HasTranslations;
-    
+
     protected $guarded=[];
 
     public $translatable=['name','description'];
@@ -22,7 +22,7 @@ class Product extends Model
     }
     public function orders()
     {
-        return $this->belongsToMany(Order::class,'order_item','order_id','product_id');
+        return $this->belongsToMany(Order::class,'order_item','product_id','order_id');
     }
     public function customers()
     {

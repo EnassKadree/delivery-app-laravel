@@ -149,27 +149,28 @@ class SessionController extends Controller
     }
 
     public function storeWeb(Request $request)
-{
-    $request->validate([
-        'email' => 'required|email',
-        'password' => 'required',
-        'phone' => 'required',
-    ]);
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+            'phone' => 'required',
+        ]);
 
-    $credentials = $request->only('email', 'password', 'phone');
+        $credentials = $request->only('email', 'password', 'phone');
 
-    if (Auth::attempt($credentials)) {
-        if (auth()->user()->role == 'admin') {
-            return redirect()->route('admin.dashboard');
-        } else {
-            return redirect()->route('login');
+        if (Auth::attempt($credentials)) {
+            $user = User::find(Auth::id());
+            if ($user && $user->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            } else {
+                return redirect()->route('login');
+            }
         }
-    }
 
-    return redirect()->route('login')->withErrors([
-        'email' => 'Invalid credentials.',
-    ]);
-}
+        return redirect()->route('login')->withErrors([
+            'email' => 'Invalid credentials.',
+        ]);
+    }
 
 
     public function logout(Request $request)

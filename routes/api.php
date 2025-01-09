@@ -5,6 +5,7 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
@@ -50,6 +51,10 @@ Route::post('/Cart/delete/one/{id}',[CartController::class,'removeOneItem'])->mi
 Route::delete('/Cart/delete/{id}',[CartController::class,'destroy'])->middleware('auth:sanctum');
 Route::get('/cart/search', [CartController::class,'search'])->middleware('auth:sanctum');
 
+Route::get('/orders',[OrderController::class,'index'])->middleware('auth:sanctum');
+Route::get('/orders/{id}',[OrderController::class,'show'])->middleware('auth:sanctum');
+Route::get('/order/check',[OrderController::class,'checkOrder'])->middleware('auth:sanctum');
+Route::post('/order',[OrderController::class,'order'])->middleware('auth:sanctum');
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
