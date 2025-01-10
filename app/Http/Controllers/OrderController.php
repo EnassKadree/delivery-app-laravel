@@ -155,9 +155,7 @@ class OrderController extends Controller
             ], 200);
     }
 
-    /**
-     * Display the specified resource.
-     */
+
     public function show($id)
     {
         $locale = app()->getLocale();
@@ -223,8 +221,39 @@ class OrderController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Order $order)
+    public function destroy($id)
     {
-        //
+      $locale =app()->getLocale();
+      $user=Auth::user();
+
+        $customer=Customer::where('user_id',$user->id)->first();
+        $order = $customer->orders()->where('id', $id)->first();
+        if (!$order) {
+            return response()->json([
+                'message' => 'Order not found for this customer'
+            ], 404);
+        }
+      $order_items=$order->products;
+      foreach($order_items  as $product)
+      {
+        $row = DB::table('order_item')
+        ->where('order_id',$order->id )
+        ->where('product_id',$product->id )
+        ->first();
+
+        $product->stock= $product->stock+$row->quantity;
+        $product->save();
+
+      }
+      Order::destroy($id);
+
+   $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
+    $message = $locale == 'ar' ? 'تم حذف الطلب بنجاح' : 'order deleeted  successfully.';
+    return response()->json(
+        [
+            'status' => $status,
+            'message' => $message
+        ], 200);
+
     }
 }
