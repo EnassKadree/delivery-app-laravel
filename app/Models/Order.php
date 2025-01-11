@@ -7,9 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     protected $guarded=[];
-    protected $casts = [
-        'status' => 'array', 
-    ];
 
     public function customer()
     {

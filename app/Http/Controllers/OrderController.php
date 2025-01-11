@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Customer;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -69,26 +70,27 @@ class OrderController extends Controller
             {
                 $status = $locale == 'ar' ? 'فشل' : 'Failed';
                 $message = $locale == 'ar'
-                ? $row->quantity . ":ولكنك طلبت" . $product->stock . ":الكمية المتاحة." . $product->name . ":لا يوجد كمية كافية من هذا المنتج"  : "Not enough stock for the product: " . $product->name . ".Available stock is " . $product->stock . ",  but you requested " . $row->quantity . ".";
+                ? $row->quantity . ":ولكنك طلبت" . $product->stock . ":الكمية المتاحة." . $product->name . ":لا يوجد كمية كافية من هذا المنتج" 
+                : "Not enough stock for the product: " . $product->name . ".Available stock is " . $product->stock . ",  but you requested " . $row->quantity . ".";
                 return response()->json(
-               [
-                 'status'=>$status,
-                 'message'=>$message,
-               ],404
+                [
+                    'status'=>$status,
+                    'message'=>$message,
+                ],404
             );
             }
         }
 
 
-       $status = $locale == 'ar' ? 'نجح' : 'Success';
-       $message = $locale == 'ar' ? 'تم التحقق من الطلب ' : 'the Order checked successfully';
-       return response()->json(
+        $status = $locale == 'ar' ? 'نجح' : 'Success';
+        $message = $locale == 'ar' ? 'تم التحقق من الطلب ' : 'the Order checked successfully';
+        return response()->json(
         [
-          'status'=>$status,
-          'message'=>$message,
-          'customer_address'=>$customer->address
+            'status'=>$status,
+            'message'=>$message,
+            'customer_address'=>$customer->address
         ],200
-     );
+        );
 
     }
     public function order(Request $request)
@@ -101,12 +103,25 @@ class OrderController extends Controller
         $customer=Customer::where('user_id',$user->id)->first();
         $customer_cart=$customer->cart;
         $cart_items=$customer_cart->products;
+        if($cart_items->isEmpty())
+        {
+            $status = $locale == 'ar' ? 'فشل' : 'Failed';
+            $message = $locale == 'ar' ? 'لا يوجد عناصر في السلة' : 'There is no items in the cart';
+
+            return response()->json(
+            [
+                'status' => $status,
+                'message' => $message,
+
+            ], 403);
+        }
 
         //create the order
         $order=Order::create([
-         'total_price'=>0,
-         'address'=>$address['address'],
-         'customer_id'=>$customer->id,
+            'total_price'=>0,
+            'address'=>$address['address'],
+            'customer_id'=>$customer->id,
+            'status'=>'pending'
         ]);
 
 
@@ -165,7 +180,8 @@ class OrderController extends Controller
 
         $order = $customer->orders()->where('id', $id)->first();
 
-        if (!$order) {
+        if (!$order)
+        {
             return response()->json(['message' => 'Order not found for this customer'], 404);
         }
 
@@ -213,9 +229,131 @@ class OrderController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Order $order)
+    public function update(Request $request, $id)
     {
-        //
+        $locale =app()->getLocale();
+
+        $attributes= $request->validate([
+            'address'=>['required'],
+            'products'=>['required'],
+        ]);
+
+        $user=Auth::user();
+        $customer=Customer::where('user_id',$user->id)->first();
+        $order = $customer->orders()->where('id', $id)->first();
+        if (!$order) {
+            return response()->json([
+                'message' => 'Order not found for this customer'
+            ], 404);
+        } 
+        if ($order->status != 'pending') {
+            return response()->json([
+                'message' => "Order can't be edited"
+            ], 403);
+        }
+        $order->address=$attributes['address'];
+        $order->save();
+        $products=$attributes['products'];
+
+        if(!empty($products))
+        {
+            foreach($products as $listItem)
+            {
+                $productId = $listItem['product_id'];
+                $newQuantity = $listItem['quantity'];
+                $product=Product::where('id',$productId)->first();
+
+                $row = DB::table('order_item')
+                ->where('order_id',$order->id )
+                ->where('product_id',$productId )
+                ->first();
+                $oldQuantity=$row->quantity;
+
+                if ($newQuantity==0)
+                {
+
+                    $product->stock=$product->stock + $oldQuantity;
+                    $product->save();
+
+
+                    $order->total_price=$order->total_price - ($oldQuantity*$product->price);
+                    $order->save();
+
+                    $order->products()->detach($product->id);
+
+                    $order_products=$order->products;
+                    if($order_products->isEmpty())
+                    {
+
+                        Order::destroy($order->id);
+
+                        $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
+                        $message = $locale == 'ar' ? 'تم حذف الطلب بنجاح.' : 'order has been deleted successfully.';
+                
+                        return response()->json(
+                            [
+                                'status' => $status,
+                                'message' => $message,
+                            ], 200); 
+                    }
+                    
+                }
+                else if($oldQuantity<$newQuantity)
+                {
+                    $diffrence=$newQuantity-$oldQuantity;
+
+                    if($product->stock < $diffrence)
+                    {
+                        $status = $locale == 'ar' ? 'فشل' : 'Failed';
+                        $message = $locale == 'ar'
+                        ? $row->$diffrence . ":ولكنك طلبت" . $product->stock . ":الكمية المتاحة." . $product->name . ":لا يوجد كمية كافية من هذا المنتج" 
+                        : "Not enough stock for the product: " . $product->name . ".Available stock is " . $product->stock . ",  but you requested " . $row->$diffrence . ".";
+                        return response()->json(
+                        [
+                        'status'=>$status,
+                        'message'=>$message,
+                        ],404
+                    );
+                    }
+                    DB::table('order_item')
+                    ->where('order_id', $order->id)
+                    ->where('product_id', $productId)
+                    ->update(['quantity' => $newQuantity]);
+
+                    $product->stock= $product->stock-$diffrence;
+                    $product->save();
+
+                    $order->total_price=$order->total_price + ($diffrence*$product->price);
+                    $order->save();
+                }
+                else if($oldQuantity>$newQuantity)
+                {
+                    $diffrence=$oldQuantity-$newQuantity;
+
+                    $product->stock=$product->stock + $diffrence;
+                    $product->save();
+
+                    DB::table('order_item')
+                    ->where('order_id', $order->id)
+                    ->where('product_id', $productId)
+                    ->update(['quantity' => $newQuantity]);
+
+                    $order->total_price=$order->total_price - ($diffrence*$product->price);
+                    $order->save();
+                    
+                }
+                
+        }
+    }
+        $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
+        $message = $locale == 'ar' ? 'تم التعديل بنجاح.' : 'Data has been updated successfully.';
+
+        return response()->json(
+            [
+                'status' => $status,
+                'message' => $message,
+            ], 200); 
+
     }
 
     /**
@@ -223,8 +361,8 @@ class OrderController extends Controller
      */
     public function destroy($id)
     {
-      $locale =app()->getLocale();
-      $user=Auth::user();
+        $locale =app()->getLocale();
+        $user=Auth::user();
 
         $customer=Customer::where('user_id',$user->id)->first();
         $order = $customer->orders()->where('id', $id)->first();
@@ -233,9 +371,9 @@ class OrderController extends Controller
                 'message' => 'Order not found for this customer'
             ], 404);
         }
-      $order_items=$order->products;
-      foreach($order_items  as $product)
-      {
+        $order_items=$order->products;
+        foreach($order_items  as $product)
+        {
         $row = DB::table('order_item')
         ->where('order_id',$order->id )
         ->where('product_id',$product->id )
@@ -244,10 +382,10 @@ class OrderController extends Controller
         $product->stock= $product->stock+$row->quantity;
         $product->save();
 
-      }
-      Order::destroy($id);
+        }
+        Order::destroy($id);
 
-   $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
+    $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
     $message = $locale == 'ar' ? 'تم حذف الطلب بنجاح' : 'order deleeted  successfully.';
     return response()->json(
         [
