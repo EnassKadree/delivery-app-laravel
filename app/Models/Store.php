@@ -4,12 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Translatable\HasTranslations;
 
 class Store extends Model
 {
-    use SoftDeletes;
+    use HasTranslations,SoftDeletes;
+
 
     protected $guarded = [];
+
+    public $translatable=['name','address'];
 
     public function user()
     {
@@ -20,4 +24,5 @@ class Store extends Model
     {
         return $this->hasMany(Product::class);
     }
+    
 }

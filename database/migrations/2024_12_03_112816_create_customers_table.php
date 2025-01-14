@@ -17,6 +17,7 @@ return new class extends Migration
 
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
+            $table->string('fcm_token');
             $table->foreignIdFor(User::class)->constrained()->onDelete('cascade');
             $table->string('first_name');
             $table->string('last_name');

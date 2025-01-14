@@ -25,6 +25,7 @@ class RegisterController extends Controller
         $locale = app()->getLocale();
         //validate
         $attributes=$request->validate([
+            'fcm_token'=>['required'],
             'first_name'=>['required'],
             'last_name'=>['required'],
             'phone' => ['required','regex:/^09\d{8}$/','size:10'],
@@ -32,7 +33,7 @@ class RegisterController extends Controller
             'password'=>['required','confirmed'],
             'address'=>['required'],
         ]);
-        
+
         $existingUser = User::where('phone', $attributes['phone'])->first();
 
         $status = $locale == 'ar' ? 'فشل' : 'Failed';
@@ -54,6 +55,7 @@ class RegisterController extends Controller
         ]);
         //create customer
         $customer=Customer::create([
+            'fcm_token'=>$attributes['fcm_token'],
             'user_id'=>$user['id'],
             'first_name'=>$attributes['first_name'],
             'last_name'=>$attributes['last_name'],
