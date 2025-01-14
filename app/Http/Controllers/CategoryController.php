@@ -4,14 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreCategoryRequest;
+use App\Http\Requests\UpdateCategoryRequest;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Customer;
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function __construct()
     {
         $this->middleware(SetLocale::class);
@@ -42,16 +41,6 @@ class CategoryController extends Controller
             ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-
-    }
-
-
-   
     public function show(string $id)
     {
         $locale =app()->getLocale();
@@ -121,21 +110,6 @@ class CategoryController extends Controller
         ],200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
     public function search(Request $request, $id)
     {
         $locale =app()->getLocale();
@@ -210,4 +184,61 @@ class CategoryController extends Controller
                 'products' => $translatedProducts,
             ],200);
     }
+
+
+    public function indexweb()
+    {
+        $categories = Category::all();
+        return view('category.index', compact('categories'));
+    }
+
+    public function create()
+    {
+        return view('category.create');
+    }
+
+    public function store(StoreCategoryRequest $request)
+    {
+        $data = $request->validated();
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('categories', 'public');
+        }
+
+        Category::create($data);
+
+        return redirect()->route('admin.category.indexweb')->with('success', 'Category created successfully.');
+    }
+
+    public function edit(category $category)
+    {
+        $category->name = json_decode($category->name, true);
+        return view('category.edit', ['category' => $category]);
+    }
+
+    public function update(UpdateCategoryRequest $request, $id)
+    {
+        $category = Category::findOrFail($id);
+        $data = $request->validated();
+        $category->name = json_encode($data['name']);
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('categories', 'public');
+            $category->image = $path;
+        }
+        $category->save();
+
+        return redirect()->route('admin.category.indexweb')->with('success', 'Category updated successfully.');
+    }
+
+    public function destroy($id)
+    {
+        $category = Category::find($id);
+
+        if ($category) {
+            $category->delete();
+        }
+
+        return redirect()->route('admin.category.indexweb')->with('success', 'Category deleted successfully.');
+    }
+
 }

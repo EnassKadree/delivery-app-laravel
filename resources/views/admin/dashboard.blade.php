@@ -44,6 +44,8 @@
                     <ul class="menu">
                         <li><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                         <li><a href="{{ route('admin.store.indexweb') }}">Stores</a></li>
+                        <li><a href="{{ route('admin.product.indexweb') }}">Products</a></li>
+                        <li><a href="{{ route('admin.category.indexweb') }}">Categories</a></li>
 
                     </ul>
                 </div>

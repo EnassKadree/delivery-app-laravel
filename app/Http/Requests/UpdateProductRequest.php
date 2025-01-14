@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreStoreRequest extends FormRequest
+class UpdateProductRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,7 +13,7 @@ class StoreStoreRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return true; // You can add logic to check if the user has permission
     }
 
     /**
@@ -27,11 +27,13 @@ class StoreStoreRequest extends FormRequest
             'name' => 'required|array',
             'name.en' => 'required|string|max:255',
             'name.ar' => 'required|string|max:255',
-            'address' =>  'required|array',
-            'address.en' => 'required|string|max:255',
-            'address.ar' => 'required|string|max:255',
-            'logo_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'user_id' => 'nullable|exists:users,id',
+            'description' => 'required|array',
+            'description.en' => 'required|string',
+            'description.ar' => 'required|string',
+            'price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'category_id' => 'required|exists:categories,id',
         ];
     }
 }

@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Translatable\HasTranslations;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Store extends Model
 {
+
     use HasTranslations,SoftDeletes;
 
 
@@ -24,5 +25,5 @@ class Store extends Model
     {
         return $this->hasMany(Product::class);
     }
-    
+
 }

@@ -56,6 +56,7 @@ Route::get('/orders/{id}',[OrderController::class,'show'])->middleware('auth:san
 Route::get('/order/check',[OrderController::class,'checkOrder'])->middleware('auth:sanctum');
 Route::post('/order',[OrderController::class,'order'])->middleware('auth:sanctum');
 Route::delete('/order/delete/{id}',[OrderController::class,'destroy'])->middleware('auth:sanctum');
+Route::post('/order/edit/{id}',[OrderController::class,'update'])->middleware('auth:sanctum');
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
