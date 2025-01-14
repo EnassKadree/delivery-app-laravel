@@ -8,7 +8,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Product extends Model
 {
     use HasTranslations;
+<<<<<<< HEAD
     use SoftDeletes;
+=======
+>>>>>>> 2f14c43bf08f5f11032206b3011912c90d01f733
 
     protected $guarded=[];
 
@@ -24,7 +27,7 @@ class Product extends Model
     }
     public function orders()
     {
-        return $this->belongsToMany(Order::class,'order_item','order_id','product_id');
+        return $this->belongsToMany(Order::class,'order_item','product_id','order_id');
     }
     public function customers()
     {

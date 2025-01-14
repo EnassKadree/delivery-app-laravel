@@ -156,7 +156,7 @@ public function storeWeb(Request $request)
         'phone' => 'required',
     ]);
 
-    $credentials = $request->only('email', 'password', 'phone');
+        $credentials = $request->only('email', 'password', 'phone');
 
     if (Auth::attempt($credentials)) {
         $user = User::find(Auth::id());
@@ -165,13 +165,12 @@ public function storeWeb(Request $request)
         } else {
             return redirect()->route('login');
         }
+
+        return redirect()->route('login')->withErrors([
+            'email' => 'Invalid credentials.',
+        ]);
     }
-
-    return redirect()->route('login')->withErrors([
-        'email' => 'Invalid credentials.',
-    ]);
 }
-
 
 
     public function logout(Request $request)

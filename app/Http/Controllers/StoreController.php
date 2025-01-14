@@ -9,6 +9,9 @@ use App\Http\Requests\UpdateStoreRequest;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Customer;
+use Illuminate\Support\Facades\Log;
+
+
 class StoreController extends Controller
 {
     public function __construct()

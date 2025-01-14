@@ -29,7 +29,7 @@ class ProductController extends Controller
         $user=Auth::user();
         $customer=Customer::where('user_id',$user->id)->first();
         $customer_cart=$customer->cart;
-        $products =Product::latest()->take(20)->get()->map(function ($product)use($customer_cart,$customer)
+        $products =Product::latest()->take(30)->get()->map(function ($product)use($customer_cart,$customer)
         {
 
             if( !$product->carts )
