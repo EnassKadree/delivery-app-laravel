@@ -24,8 +24,12 @@ class UpdateStoreRequest extends FormRequest
     public function rules()
     {
         return [
+            'name' => 'required|array',
             'name.en' => 'required|string|max:255',
+            'name.ar' => 'required|string|max:255',
+            'address' =>  'required|array',
             'address.en' => 'required|string|max:255',
+            'address.ar' => 'required|string|max:255',
             'logo_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ];
     }

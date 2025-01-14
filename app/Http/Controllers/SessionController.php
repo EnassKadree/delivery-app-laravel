@@ -148,7 +148,7 @@ class SessionController extends Controller
         //
     }
 
-    public function storeWeb(Request $request)
+public function storeWeb(Request $request)
 {
     $request->validate([
         'email' => 'required|email',
@@ -159,7 +159,8 @@ class SessionController extends Controller
     $credentials = $request->only('email', 'password', 'phone');
 
     if (Auth::attempt($credentials)) {
-        if (auth()->user()->role == 'admin') {
+        $user = User::find(Auth::id());
+        if ($user && $user->role === 'admin') {
             return redirect()->route('admin.dashboard');
         } else {
             return redirect()->route('login');
@@ -170,6 +171,7 @@ class SessionController extends Controller
         'email' => 'Invalid credentials.',
     ]);
 }
+
 
 
     public function logout(Request $request)

@@ -11,10 +11,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Customer;
 class StoreController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-
     public function __construct()
     {
         $this->middleware(SetLocale::class);
@@ -47,9 +43,7 @@ class StoreController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
+
     public function show(string $id)
     {
 
@@ -201,18 +195,7 @@ class StoreController extends Controller
 
     public function indexweb()
 {
-    $stores = Store::all()->map(function ($store) {
-        $name = json_decode($store->name, true);
-        $address = json_decode($store->address, true);
-
-        return [
-            'id' => $store->id,
-            'name' => $name['en'] ?? 'N/A',
-            'address' => $address['en'] ?? 'N/A',
-            'image' => $store->logo_image
-        ];
-    });
-
+    $stores = Store::all();
     return view('store.index', compact('stores'));
 }
 
@@ -224,10 +207,7 @@ class StoreController extends Controller
 
     public function store(StoreStoreRequest $request)
     {
-        \Log::info($request->all());
         $data = $request->validated();
-        $data['name'] = json_encode($request->input('name'));
-        $data['address'] = json_encode($request->input('address'));
         $data['user_id'] = Auth::id();
 
         if ($request->hasFile('logo_image')) {
@@ -243,12 +223,15 @@ class StoreController extends Controller
 
     public function edit(store $store)
     {
+        $store->name = json_decode($store->name, true);
+        $store->address = json_decode($store->address, true);
         return view('store.edit', [ 'store' => $store ]);
     }
 
     public function update(UpdateStoreRequest $request, $id)
     {
         $store = Store::findOrFail($id);
+        $data = $request->validated();
         $store->name = json_encode($request->input('name'));
         $store->address = json_encode($request->input('address'));
 

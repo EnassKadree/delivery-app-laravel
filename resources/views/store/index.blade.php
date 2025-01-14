@@ -17,8 +17,10 @@
                     <table class="content-table">
                         <thead>
                             <th>Id</th>
-                            <th>Store Name</th>
-                            <th>Address</th>
+                            <th>Store Name (English)</th>
+                            <th>Store Name (Arabic)</th>
+                            <th>Address (English)</th>
+                            <th>Address (Arabic)</th>
                             <th>Logo</th>
                             <th>Edit</th>
                             <th>Delete</th>
@@ -26,22 +28,30 @@
                         <tbody>
                             @forelse ($stores as $store)
                                 <tr>
-                                <td>{{ $store['id'] }}</td>
-                                <td>{{ $store['name'] }}</td>
-                                <td>{{ $store['address'] }}</td>
-                                <td>
-                                    <img src="{{ asset($store['image']) }}" alt="{{ $store['name'] }}" width="50" height="50">
-                                </td>
-                                <td class="edit" style="text-align: center;">
-                                    <a href="{{ route('admin.store.edit', ['store' => $store['id']]) }}" class="btn btn-success">Edit</a>
-                                </td>
-                                <td class="delete" style="text-align: center;">
-                                    <form action="{{ route('admin.store.destroy', ['id' => $store['id']]) }}" method="POST" class="form-hidden">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-danger delete-store">Delete</button>
-                                    </form>
-                                </td>
+                                    <td>{{ $store['id'] }}</td>
+                                    <td>{{ $store->getTranslation('name', 'en') ?? 'N/A' }}</td>
+                                    <td>{{ $store->getTranslation('name', 'ar') ?? 'N/A' }}</td>
+                                    <td>{{ $store->getTranslation('address', 'en') ?? 'N/A' }}</td>
+                                    <td>{{ $store->getTranslation('address', 'ar') ?? 'N/A' }}</td>
+                                    <td>
+                                        @if (!empty($store['logo_image']))
+                                            <a href="{{ asset('storage/' . $store['logo_image']) }}" target="_blank">
+                                                <img src="{{ asset('storage/' . $store['logo_image']) }}" alt="{{ $store->getTranslation('name', 'en') }}" width="50" height="50">
+                                            </a>
+                                        @else
+                                            <img src="{{ asset('storage/placeholder-logo.png') }}" alt="No Logo" width="50" height="50">
+                                        @endif
+                                    </td>
+                                    <td class="edit" style="text-align: center;">
+                                        <a href="{{ route('admin.store.edit', ['store' => $store['id']]) }}" class="btn btn-success">Edit</a>
+                                    </td>
+                                    <td class="delete" style="text-align: center;">
+                                        <form action="{{ route('admin.store.destroy', ['id' => $store['id']]) }}" method="POST" class="form-hidden">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-danger delete-store">Delete</button>
+                                        </form>
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
@@ -49,6 +59,7 @@
                                 </tr>
                             @endforelse
                         </tbody>
+
                     </table>
                 </div>
             </div>
