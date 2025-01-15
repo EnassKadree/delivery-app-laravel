@@ -9,7 +9,6 @@ use App\Http\Requests\UpdateStoreRequest;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Customer;
-use Illuminate\Support\Facades\Log;
 
 
 class StoreController extends Controller
@@ -142,11 +141,10 @@ class StoreController extends Controller
             ], 404);
         }
 
-        $store_products =$store->products()
-        ->where('name', 'LIKE', "%{$word}%")
-        ->orWhere('description', 'LIKE', "%{$word}%")
-        ->get();
-
+           $store_products = $store->products()
+           ->where(function ($query) use ($word)
+            { $query->where('name', 'LIKE', "%{$word}%")
+                 ->orWhere('description', 'LIKE', "%{$word}%"); }) ->get();
             $translatedProducts= $store_products ->map(function ($product)use($customer_cart,$customer)
             {
 

@@ -15,7 +15,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 // Authentication Routes
 Route::get('/', function () {
     return view('auth.login');
+
 })->name('login');
+
 Route::post('/login', [SessionController::class, 'storeWeb'])->name('login.store');
 
 

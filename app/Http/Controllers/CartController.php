@@ -8,6 +8,7 @@ use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Customer;
+
 use Illuminate\Http\Request;
 
 class CartController extends Controller
@@ -220,6 +221,7 @@ class CartController extends Controller
     {
         $locale =app()->getLocale();
 
+
         $product=Product::where('id',$id)->first();
         $user=Auth::user();
         $customer=Customer::where('user_id',$user->id)->first();
@@ -251,8 +253,7 @@ class CartController extends Controller
                 );
 
         $customer_cart->products()->detach($product->id);
-
-        $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
+         $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
         $message = $locale == 'ar' ? 'تم حذف المنتج من السلة.' : 'product has been deleted from cart.';
 
         return response([

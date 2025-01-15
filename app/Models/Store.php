@@ -8,12 +8,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Store extends Model
 {
-    use HasTranslations;
-    use SoftDeletes;
+
+    use HasTranslations,SoftDeletes;
+
 
     protected $guarded = [];
 
-    public $translatable = ['name', 'address'];
+    public $translatable=['name','address'];
 
     public function user()
     {
@@ -24,4 +25,5 @@ class Store extends Model
     {
         return $this->hasMany(Product::class);
     }
+
 }
