@@ -48,7 +48,7 @@ Route::post('/category/create', [CategoryController::class, 'store'])->name('adm
 // Order
 Route::get('/orders', [OrderController::class, 'indexweb'])->name('admin.order.indexweb');
 Route::get('/order/edit/{order}', [OrderController::class, 'edit'])->name('admin.order.edit');
-Route::put('/order/update/{id}', [OrderController::class, 'update'])->name('admin.order.update');
+Route::put('/order/update/{id}', [OrderController::class, 'updateweb'])->name('admin.order.updateweb');
 
 });
 
