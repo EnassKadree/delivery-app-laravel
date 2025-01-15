@@ -8,7 +8,7 @@ use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Customer;
-use App\Services\FcmService;
+
 use Illuminate\Http\Request;
 
 class CartController extends Controller
@@ -221,7 +221,7 @@ class CartController extends Controller
     {
         $locale =app()->getLocale();
 
-        $fcms=new FcmService();
+
         $product=Product::where('id',$id)->first();
         $user=Auth::user();
         $customer=Customer::where('user_id',$user->id)->first();
@@ -253,12 +253,7 @@ class CartController extends Controller
                 );
 
         $customer_cart->products()->detach($product->id);
-        $title="Product deleted from the cart";
-                $body="doneeeeeeeeeeee!";
-
-                $fcms->sendNotification($customer->fcm_token,$title,$body);
-
-        $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
+         $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
         $message = $locale == 'ar' ? 'تم حذف المنتج من السلة.' : 'product has been deleted from cart.';
 
         return response([

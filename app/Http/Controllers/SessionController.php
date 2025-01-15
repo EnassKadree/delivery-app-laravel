@@ -29,7 +29,7 @@ class SessionController extends Controller
         $locale = app()->getLocale();
         //validate
         $attributes=request()->validate([
-        //    'fcm_token'=>['required'],
+           'fcm_token'=>['required'],
             'phone'=>['required'],
             'password'=>['required'],
             'email'=>['required']
@@ -74,8 +74,8 @@ class SessionController extends Controller
         $user=User::where('phone',$phone)->first();
         $customer=Customer::where('user_id',$user->id)->first();
 
-        // $customer->fcm_token=$attributes['fcm_token'];
-        // $customer->save;
+        $customer->fcm_token=$attributes['fcm_token'];
+        $customer->save;
 
         $token = $user->createToken('usertoken')->plainTextToken;
 

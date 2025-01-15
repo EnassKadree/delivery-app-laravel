@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\UpdateOrderStatusRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Services\FcmService;
 
 class OrderController extends Controller
 {
@@ -182,8 +183,8 @@ class OrderController extends Controller
             return response()->json(['message' => 'Order not found for this customer'], 404);
         }
 
-        // Return the order details
-        return response()->json(['order' => $order], 200);
+    
+
         $products =$order->products->map(function ($product)use($order)
         {
             $row = DB::table('order_item')
@@ -401,9 +402,18 @@ class OrderController extends Controller
     {
         $order = Order::findOrFail($id);
 
+        $fcms=new FcmService();
+
         $validated = $request->validated();
+        $customer=$order->customer;
+
         $order->status = $validated['status'];
         $order->save();
+        $status=$validated['status'];
+        $title="Check your order ";
+        $body="Your Order is $status";
+        $fcms->sendNotification($customer->fcm_token,$title,$body);
+
 
         return redirect()->route('admin.order.indexweb')->with('success', 'Order status updated successfully.');
     }
