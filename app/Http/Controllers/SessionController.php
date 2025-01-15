@@ -29,7 +29,7 @@ class SessionController extends Controller
         $locale = app()->getLocale();
         //validate
         $attributes=request()->validate([
-            'fcm_token'=>['required'],
+        //    'fcm_token'=>['required'],
             'phone'=>['required'],
             'password'=>['required'],
             'email'=>['required']
@@ -74,9 +74,9 @@ class SessionController extends Controller
         $user=User::where('phone',$phone)->first();
         $customer=Customer::where('user_id',$user->id)->first();
 
-        $customer->fcm_token=$attributes['fcm_token'];
-        $customer->save;
-        
+        // $customer->fcm_token=$attributes['fcm_token'];
+        // $customer->save;
+
         $token = $user->createToken('usertoken')->plainTextToken;
 
         $status = $locale == 'ar' ? 'تم بنجاح' : 'Success';
@@ -156,6 +156,7 @@ class SessionController extends Controller
 
 public function storeWeb(Request $request)
 {
+
     $request->validate([
         'email' => 'required|email',
         'password' => 'required',
@@ -165,16 +166,21 @@ public function storeWeb(Request $request)
         $credentials = $request->only('email', 'password', 'phone');
 
     if (Auth::attempt($credentials)) {
+
         $user = User::find(Auth::id());
+
         if ($user && $user->role === 'admin') {
+
             return redirect()->route('admin.dashboard');
         } else {
+
             return redirect()->route('login');
         }
 
         return redirect()->route('login')->withErrors([
             'email' => 'Invalid credentials.',
         ]);
+
     }
 }
 

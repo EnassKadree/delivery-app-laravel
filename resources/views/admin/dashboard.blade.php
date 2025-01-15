@@ -46,7 +46,7 @@
                         <li><a href="{{ route('admin.store.indexweb') }}">Stores</a></li>
                         <li><a href="{{ route('admin.product.indexweb') }}">Products</a></li>
                         <li><a href="{{ route('admin.category.indexweb') }}">Categories</a></li>
-
+                        <li><a href="{{ route('admin.order.indexweb') }}">Orders</a></li>
                     </ul>
                 </div>
             </div>

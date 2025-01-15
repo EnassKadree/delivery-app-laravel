@@ -6,14 +6,12 @@ use App\Models\Order;
 use App\Models\Customer;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use App\Http\Requests\UpdateOrderStatusRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $locale = app()->getLocale();
@@ -27,7 +25,8 @@ class OrderController extends Controller
                 'id'=>$order->id,
                 'status' => $order->status,
                 'address'=>$order->address,
-                'total_price'=>$order->total_price
+                'total_price'=>$order->total_price,
+                'date'=>$order->created_at
                 ];
             }
             );
@@ -45,9 +44,6 @@ class OrderController extends Controller
 
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function checkOrder()
     {
         $locale =app()->getLocale();
@@ -70,7 +66,7 @@ class OrderController extends Controller
             {
                 $status = $locale == 'ar' ? 'فشل' : 'Failed';
                 $message = $locale == 'ar'
-                ? $row->quantity . ":ولكنك طلبت" . $product->stock . ":الكمية المتاحة." . $product->name . ":لا يوجد كمية كافية من هذا المنتج" 
+                ? $row->quantity . ":ولكنك طلبت" . $product->stock . ":الكمية المتاحة." . $product->name . ":لا يوجد كمية كافية من هذا المنتج"
                 : "Not enough stock for the product: " . $product->name . ".Available stock is " . $product->stock . ",  but you requested " . $row->quantity . ".";
                 return response()->json(
                 [
@@ -173,6 +169,7 @@ class OrderController extends Controller
 
     public function show($id)
     {
+
         $locale = app()->getLocale();
 
         $user=Auth::user();
@@ -209,7 +206,7 @@ class OrderController extends Controller
         }
 
     );
-    $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
+       $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
     $message = $locale == 'ar' ? 'تم جلب البيانات بنجاح.' : 'Data has been fetched successfully.';
     $order_detailes=[
         'order_status'=>$order->status,
@@ -226,9 +223,6 @@ class OrderController extends Controller
         ], 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, $id)
     {
         $locale =app()->getLocale();
@@ -245,7 +239,7 @@ class OrderController extends Controller
             return response()->json([
                 'message' => 'Order not found for this customer'
             ], 404);
-        } 
+        }
         if ($order->status != 'pending') {
             return response()->json([
                 'message' => "Order can't be edited"
@@ -289,14 +283,14 @@ class OrderController extends Controller
 
                         $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
                         $message = $locale == 'ar' ? 'تم حذف الطلب بنجاح.' : 'order has been deleted successfully.';
-                
+
                         return response()->json(
                             [
                                 'status' => $status,
                                 'message' => $message,
-                            ], 200); 
+                            ], 200);
                     }
-                    
+
                 }
                 else if($oldQuantity<$newQuantity)
                 {
@@ -306,7 +300,7 @@ class OrderController extends Controller
                     {
                         $status = $locale == 'ar' ? 'فشل' : 'Failed';
                         $message = $locale == 'ar'
-                        ? $row->$diffrence . ":ولكنك طلبت" . $product->stock . ":الكمية المتاحة." . $product->name . ":لا يوجد كمية كافية من هذا المنتج" 
+                        ? $row->$diffrence . ":ولكنك طلبت" . $product->stock . ":الكمية المتاحة." . $product->name . ":لا يوجد كمية كافية من هذا المنتج"
                         : "Not enough stock for the product: " . $product->name . ".Available stock is " . $product->stock . ",  but you requested " . $row->$diffrence . ".";
                         return response()->json(
                         [
@@ -340,9 +334,9 @@ class OrderController extends Controller
 
                     $order->total_price=$order->total_price - ($diffrence*$product->price);
                     $order->save();
-                    
+
                 }
-                
+
         }
     }
         $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
@@ -352,13 +346,10 @@ class OrderController extends Controller
             [
                 'status' => $status,
                 'message' => $message,
-            ], 200); 
+            ], 200);
 
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
         $locale =app()->getLocale();
@@ -393,5 +384,27 @@ class OrderController extends Controller
             'message' => $message
         ], 200);
 
+    }
+
+    public function indexweb()
+    {
+        $orders = Order::with('customer')->get();
+        return view('order.index', compact('orders'));
+    }
+
+    public function edit(Order $order)
+    {
+        return view('order.edit', ['order' => $order]);
+    }
+
+    public function updateweb(UpdateOrderStatusRequest $request, $id)
+    {
+        $order = Order::findOrFail($id);
+
+        $validated = $request->validated();
+        $order->status = $validated['status'];
+        $order->save();
+
+        return redirect()->route('admin.order.indexweb')->with('success', 'Order status updated successfully.');
     }
 }
