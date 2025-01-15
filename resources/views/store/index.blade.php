@@ -16,14 +16,14 @@
                     <div class="message"></div>
                     <table class="content-table">
                         <thead>
-                            <th>Id</th>
-                            <th>Store Name (English)</th>
-                            <th>Store Name (Arabic)</th>
-                            <th>Address (English)</th>
-                            <th>Address (Arabic)</th>
-                            <th>Logo</th>
-                            <th>Edit</th>
-                            <th>Delete</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Id</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Store Name (English)</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Store Name (Arabic)</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Address (English)</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Address (Arabic)</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Logo</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Edit</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Delete</th>
                         </thead>
                         <tbody>
                             @forelse ($stores as $store)

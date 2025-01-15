@@ -13,12 +13,12 @@
                     <div class="message"></div>
                     <table class="content-table">
                         <thead>
-                            <th>Id</th>
-                            <th>Status</th>
-                            <th>Total Price</th>
-                            <th>Address</th>
-                            <th>Customer</th>
-                            <th>Edit Status</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Id</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Status</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Total Price</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Address</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Customer</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Edit Status</th>
                         </thead>
                         <tbody>
                             @forelse ($orders as $order)
