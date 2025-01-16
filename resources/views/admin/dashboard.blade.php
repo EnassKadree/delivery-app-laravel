@@ -17,7 +17,7 @@
             <div class="row">
                 <div class="offset-md-4 col-md-4">
                     <div class="logo">
-                        <a href="#"><img src="{{ asset('images/fast delivery.png') }}" style="margin-top: 20px ; margin-bottom: 30px"></a>
+                        <a href="#"><img src="{{ asset('images/logo.png') }}" style="margin-top: 30px ; margin-bottom: 30px ; width: 70%; height:70%;"></a>
                     </div>
                 </div>
                 <div class="offset-md-2 col-md-2">

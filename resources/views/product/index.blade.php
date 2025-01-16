@@ -15,18 +15,18 @@
                 <div class="col-md-12">
                     <table class="content-table">
                         <thead>
-                            <th>Id</th>
-                            <th>Product Name (English)</th>
-                            <th>Product Name (Arabic)</th>
-                            <th>Description (English)</th>
-                            <th>Description (Arabic)</th>
-                            <th>Price</th>
-                            <th>Stock</th>
-                            <th>Category</th>
-                            <th>Store</th>
-                            <th>Image</th>
-                            <th>Edit</th>
-                            <th>Delete</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Id</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Product Name (English)</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Product Name (Arabic)</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Description (English)</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Description (Arabic)</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Price</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Stock</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Category</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Store</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Image</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Edit</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Delete</th>
                         </thead>
                         <tbody>
                             @forelse ($products as $product)

@@ -15,7 +15,7 @@
             <div class="row">
                 <div class="offset-md-4 col-md-4">
                     <div class="logo border-danger">
-                        <img src="{{ asset('images/fast delivery.png') }}" alt="">
+                        <img src="{{ asset('images/logo.png') }}" alt="Logo" width="70" height="100">
                     </div>
                     <form class="yourform" action="{{ route('login.store') }}" method="post">
                         @csrf

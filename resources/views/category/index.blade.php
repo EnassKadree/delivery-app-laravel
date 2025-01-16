@@ -16,12 +16,12 @@
                     <div class="message"></div>
                     <table class="content-table">
                         <thead>
-                            <th>Id</th>
-                            <th>Category Name (English)</th>
-                            <th>Category Name (Arabic)</th>
-                            <th>Image</th>
-                            <th>Edit</th>
-                            <th>Delete</th>
+                            <th style="background-color:rgb(87, 96, 95);">Id</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Category Name (English)</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Category Name (Arabic)</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Image</th>
+                            <th  style="background-color: rgb(87, 96, 95);">Edit</th>
+                            <th  style="background-color:rgb(87, 96, 95);">Delete</th>
                         </thead>
                         <tbody>
                             @forelse ($categories as $category)
