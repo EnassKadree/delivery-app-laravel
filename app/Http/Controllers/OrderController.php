@@ -154,7 +154,10 @@ class OrderController extends Controller
             $customer_cart->total_price=0;
             $customer_cart->save();
         }
-
+        $fcms=new FcmService();
+        $title="Check your order ";
+        $body="Your Order is pending";
+        $fcms->sendNotification($customer->fcm_token,$title,$body);
 
             $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
             $message = $locale == 'ar' ? 'اكتمل الطلب بنجاح' : 'Order Completed  successfully.';
@@ -183,7 +186,7 @@ class OrderController extends Controller
             return response()->json(['message' => 'Order not found for this customer'], 404);
         }
 
-    
+
 
         $products =$order->products->map(function ($product)use($order)
         {
@@ -223,6 +226,9 @@ class OrderController extends Controller
             'order_detailes'=>$order_detailes
         ], 200);
     }
+
+
+  
 
     public function update(Request $request, $id)
     {
@@ -410,6 +416,7 @@ class OrderController extends Controller
         $order->status = $validated['status'];
         $order->save();
         $status=$validated['status'];
+
         $title="Check your order ";
         $body="Your Order is $status";
         $fcms->sendNotification($customer->fcm_token,$title,$body);

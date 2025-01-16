@@ -8,6 +8,7 @@ use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Customer;
+use App\Services\FcmService;
 
 use Illuminate\Http\Request;
 
@@ -217,50 +218,58 @@ class CartController extends Controller
      * Remove the specified resource from storage.
      */
 
-    public function destroy($id)
-    {
-        $locale =app()->getLocale();
+
+     public function destroy($id)
+     {
+         $locale =app()->getLocale();
+
+         $fcms=new FcmService();
+         $product=Product::where('id',$id)->first();
+         $user=Auth::user();
+         $customer=Customer::where('user_id',$user->id)->first();
+         $customer_cart=$customer->cart;
+
+         $row = DB::table('cart_item')
+         ->where('cart_id',$customer_cart->id )
+         ->where('product_id',$product->id )
+         ->first();
+
+         if (!$row)
+             {
+                 $status = $locale == 'ar' ? ' فشل' : 'Failed';
+                 $message = $locale == 'ar' ? 'غير موجود': 'does not exist.';
+                 return response()->json(
+                 [
+                     'status'=>$status,
+                     'message'=>$message,
+                 ], 400);
+             }
 
 
-        $product=Product::where('id',$id)->first();
-        $user=Auth::user();
-        $customer=Customer::where('user_id',$user->id)->first();
-        $customer_cart=$customer->cart;
+         $total=($row->quantity)*($product->price);
+         $updatedPrice=$customer_cart->total_price-$total;
+                 $customer_cart->update(
+                     [
+                         'total_price' => $updatedPrice
+                     ]
+                 );
 
-        $row = DB::table('cart_item')
-        ->where('cart_id',$customer_cart->id )
-        ->where('product_id',$product->id )
-        ->first();
+         $customer_cart->products()->detach($product->id);
+         $title="Product deleted from the cart";
+                 $body="doneeeeeeeeeeee!";
 
-        if (!$row)
-            {
-                $status = $locale == 'ar' ? ' فشل' : 'Failed';
-                $message = $locale == 'ar' ? 'غير موجود': 'does not exist.';
-                return response()->json(
-                [
-                    'status'=>$status,
-                    'message'=>$message,
-                ], 400);
-            }
+                 $fcms->sendNotification($customer->fcm_token,$title,$body);
 
-
-        $total=($row->quantity)*($product->price);
-        $updatedPrice=$customer_cart->total_price-$total;
-                $customer_cart->update(
-                    [
-                        'total_price' => $updatedPrice
-                    ]
-                );
-
-        $customer_cart->products()->detach($product->id);
          $status = $locale == 'ar' ? ' تم بنجاح' : 'Success';
-        $message = $locale == 'ar' ? 'تم حذف المنتج من السلة.' : 'product has been deleted from cart.';
+         $message = $locale == 'ar' ? 'تم حذف المنتج من السلة.' : 'product has been deleted from cart.';
 
-        return response([
-            'status'=>$status,
-            'message'=>$message,
-        ], 200);
-    }
+         return response([
+             'status'=>$status,
+             'message'=>$message,
+         ], 200);
+     }
+
+
 
 
 
